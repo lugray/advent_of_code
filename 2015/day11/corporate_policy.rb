@@ -46,7 +46,7 @@ class CorporatePolicy
   end
 end
 
-corporate_policy = CorporatePolicy.new('hepxcrrq')
+corporate_policy = CorporatePolicy.new('vzbxkghb')
 puts first = corporate_policy.next_pass
 corporate_policy = CorporatePolicy.new(first)
 puts corporate_policy.next_pass

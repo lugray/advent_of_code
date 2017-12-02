@@ -14,6 +14,6 @@ class LookAndSay
   end
 end
 
-look_and_say = LookAndSay.new('3113322113')
+look_and_say = LookAndSay.new('1321131112')
 puts look_and_say.nth(40).length
 puts look_and_say.nth(50).length
