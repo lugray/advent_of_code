@@ -8,55 +8,76 @@ class CoordinateList
     end
   end
 
+  def max_area
+    areas.values.max
+  end
+
+  def region_size(max_dist_sum = 10000)
+    board.count do |c|
+      dist_sum(c) < max_dist_sum
+    end
+  end
+
+  private
+
+  def dist_sum(c1)
+    @list.inject(0) do |sum, c2|
+      sum + (c2 - c1)
+    end
+  end
+
+  def board
+    return enum_for(:board) unless block_given?
+    (left..right).each do |x|
+      (bottom..top).each do |y|
+        yield Coordinate.new(x, y)
+      end
+    end
+  end
+
   def areas
-    initial = (left..right).flat_map do |x|
-      (bottom..top).map do |y|
-        c1 = Coordinate.new(x, y)
-        mins = @list.min_by(2) do |c2|
-          c1 - c2
-        end
-        if mins.first != mins.last
-          mins.first
-        end
-      end
-    end.compact.group_by(&:itself).transform_values(&:length)
-    border = (left..right).zip([top].cycle) +
+    initial = board.map { |c| closest(c) }.compact.group_by(&:itself).transform_values(&:length)
+    infinite_areas = border.map { |c| closest(c) }.compact.uniq
+    initial.reject { |coord, area| infinite_areas.include?(coord) }
+  end
+
+  def border
+    @border ||= ((left..right).zip([top].cycle) +
       (left..right).zip([bottom].cycle) +
-      (bottom..top).zip([left].cycle) +
-      (bottom..top).zip([right].cycle)
-    infinite_areas = border.map do |x,y|
-      c1 = Coordinate.new(x,y)
-      mins = @list.min_by(2) do |c2|
-        c1 - c2
+      (bottom..top).zip([left].cycle).map(&:reverse) +
+      (bottom..top).zip([right].cycle).map(&:reverse)).map do |x, y|
+        Coordinate.new(x, y)
       end
-      if mins.first != mins.last
-        mins.first
-      end
-    end.compact.uniq
-    # initial.reject do |coord, area|
-    #   infinite_areas.include?(coord)
-    # end
+  end
+
+  def closest(c1)
+    mins = @list.min_by(2) do |c2|
+      c1 - c2
+    end
+    if mins.first - c1 != mins.last - c1
+      mins.first
+    end
   end
 
   def left
-    @list.min_by(&:x).x
+    @left ||= @list.min_by(&:x).x
   end
 
   def right
-    @list.max_by(&:x).x
+    @right ||= @list.max_by(&:x).x
   end
 
   def bottom
-    @list.min_by(&:y).y
+    @bottom ||= @list.min_by(&:y).y
   end
 
   def top
-    @list.max_by(&:y).y
+    @top ||= @list.max_by(&:y).y
   end
 
   class Coordinate
     attr_reader :x, :y
-    def initialize(x, y)
+    def initialize(x, y, id = nil)
       @x = x
       @y = y
     end
@@ -65,8 +86,8 @@ class CoordinateList
       (@x - other.x).abs + (@y - other.y).abs
     end
 
-    def to_s
-      "(#{x}, #{y})"
+    def ==(other)
+      self - other == 0
     end
   end
 end
@@ -78,6 +99,11 @@ input ='1, 1
 5, 5
 8, 9
 '
-
 cl = CoordinateList.new(input)
-puts cl.areas
+puts cl.max_area
+puts cl.region_size(32)
+
+input = File.read('input')
+cl = CoordinateList.new(input)
+puts cl.max_area
+puts cl.region_size
