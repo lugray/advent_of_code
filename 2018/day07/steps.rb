@@ -14,33 +14,29 @@ class Instructions
 
   def each
     return enum_for(&:each) unless block_given?
-    until @steps.values.all?(&:done?) do
-      step = @steps.values.select(&:available?).min_by(&:id)
+    until steps.all?(&:done?) do
+      step = steps.select(&:available?).min_by(&:id)
       yield step
       step.done
     end
-    @steps.each_value(&:reset)
+    steps.each(&:reset)
   end
 
-  # 🙈 UGLY.  Don't emulate this.
   def duration(parallelization, time_delta)
     total_time = 0
     workers = Array.new(parallelization) { Worker.new(time_delta) }
-    until @steps.values.all?(&:done?) do
-      stp = @steps.values.select(&:available?).min_by(&:id)
+    until steps.all?(&:done?) do
+      step = steps.select(&:available?).min_by(&:id)
       worker = workers.find { |w| w.available? }
-      until (stp && worker) do
-        time = workers.map(&:remaining_time).min
-        workers.each { |w| w.work_for(time) }
-        total_time += time
-        break if @steps.values.all?(&:done?)
-        stp = @steps.values.select(&:available?).min_by(&:id)
-        worker = workers.find { |w| w.available? }
+      if step && worker
+        worker.assign(step)
+        next
       end
-      break if @steps.values.all?(&:done?)
-      worker.assign(stp)
+      time = workers.map(&:remaining_time).min
+      workers.each { |w| w.work_for(time) }
+      total_time += time
     end
-    @steps.each_value(&:reset)
+    steps.each(&:reset)
     total_time
   end
 
@@ -125,10 +121,6 @@ class Instructions
 
     def available?
       !done? && !claimed? && parents.all?(&:done?)
-    end
-
-    def to_s
-      "#{id}, Parents: #{parents.map(&:id).join(', ')}"
     end
 
     def ==(other)
