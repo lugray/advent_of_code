@@ -3,30 +3,18 @@
 class Power
   def initialize(serial_number)
     @serial_number = serial_number
-    @power_level = Array.new(301) { Array.new(301) }
-    populate_grid
+    @power_level = Array.new(301) { Array.new(301) { Array.new(301) } }
   end
 
-  def populate_grid
-    (1..300).each do |x|
-      (1..300).each do |y|
-        @power_level[x][y] = ((x + 10) * y + @serial_number) * (x + 10) / 100 % 10 - 5
-      end
-    end
-  end
-
-  def best_any_square_power
+  def best_power(min_s, max_s)
     max = -Float::INFINITY
     loc = nil
-    (1..300).each do |x|
-      (1..300).each do |y|
-        max_s = 301 - [x, y].max
-        square = 0
-        (1..max_s).each do |s|
-          square += (0...s).inject(0) { |m, dx| m + @power_level[x+dx][y+s-1] }
-          square += (0...s-1).inject(0) { |m, dy| m + @power_level[x+s-1][y+dy] }
-          if square > max
-            max = square
+    (min_s..max_s).each do |s|
+      (1..301-s).each do |x|
+        (1..301-s).each do |y|
+          g = power_level(x,y,s)
+          if g > max
+            max = g
             loc = [x, y, s]
           end
         end
@@ -35,30 +23,23 @@ class Power
     loc.join(',')
   end
 
-  def best_power
-    max = -Float::INFINITY
-    loc = nil
-    (1..298).each do |x|
-      (1..298).each do |y|
-        g = grid_power_level(x,y)
-        if g > max
-          max = g
-          loc = [x, y]
-        end
-      end
-    end
-    loc.join(',')
+  def power_level(x, y, s = 3)
+    @power_level[x][y][s] ||= unmemo_power_level(x, y, s)
   end
 
-  def grid_power_level(x, y, s = 3)
-    (0...s).flat_map do |dx|
-      (0...s).map do |dy|
-        @power_level[x + dx][y + dy]
-      end
-    end.sum
+  private
+
+  def unmemo_power_level(x, y, s)
+    if s == 0
+      0
+    elsif s == 1
+      ((x + 10) * y + @serial_number) * (x + 10) / 100 % 10 - 5
+    else
+      power_level(x,y,s-1) + power_level(x+1,y+1,s-1) + power_level(x, y+s-1, 1) + power_level(x+s-1, y, 1) - power_level(x+1,y+1,s-2)
+    end
   end
 end
 
 p = Power.new(1308)
-puts p.best_power
-puts p.best_any_square_power
+puts p.best_power(3,3)
+puts p.best_power(1,300)
