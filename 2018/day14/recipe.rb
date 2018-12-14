@@ -64,40 +64,34 @@ def ten_after(n)
   head = elf1 = Ring.new(3)
   elf2 = elf1.insert(7)
   count = 2
-  catch :done do
-    loop do
-      (elf1.value + elf2.value).digits.reverse.each do |d|
-        head.prev.insert(d)
-        count +=1
-        throw :done if count == n + 10
-      end
-      elf1 = elf1.next(elf1.value+1)
-      elf2 = elf2.next(elf2.value+1)
+  loop do
+    (elf1.value + elf2.value).digits.reverse.each do |d|
+      head.prev.insert(d)
+      count +=1
+      return head.prev(10).to_a(10).join if count == n + 10
     end
+    elf1 = elf1.next(elf1.value+1)
+    elf2 = elf2.next(elf2.value+1)
   end
-
-  head.prev(10).to_a(10).join
 end
 
 # Slow 😞
 def count_til(n)
-  n = n.to_s
+  n = n.digits.reverse
   head = elf1 = Ring.new(3)
   elf2 = elf1.insert(7)
   count = 2
-  catch :done do
-    loop do
-      (elf1.value + elf2.value).digits.reverse.each do |d|
-        head.prev.insert(d)
-        count +=1
-        throw :done if head.prev(n.length).to_a(n.length).join == n
-      end
-      elf1 = elf1.next(elf1.value+1)
-      elf2 = elf2.next(elf2.value+1)
+  last = Array.new(n.length - 2) + [3, 7]
+  loop do
+    (elf1.value + elf2.value).digits.reverse.each do |d|
+      head.prev.insert(d)
+      count +=1
+      last.push(d).shift
+      return count - n.length if n == last
     end
+    elf1 = elf1.next(elf1.value+1)
+    elf2 = elf2.next(elf2.value+1)
   end
-
-  count - n.length
 end
 
 puts ten_after(110201)
