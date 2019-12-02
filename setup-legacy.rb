@@ -23,25 +23,48 @@ class Setup
   def http
     @http ||= Net::HTTP.start('adventofcode.com', 443, use_ssl: true)
   end
+
 end
 
-class SetupDay
+module SetupDay
+  class << self
+    def new(main_dir, year, day, http, headers)
+      if year >= 2019
+        SetupNewDay
+      else
+        SetupLegacyDay
+      end.new(main_dir, year, day, http, headers)
+    end
+  end
+end
+
+class SetupLegacyDay
   attr_reader :dir, :year, :day, :http, :headers
 
-  def initialize(dir, year, day, http, headers)
-    @dir = dir
+  def initialize(main_dir, year, day, http, headers)
+    @dir = File.join(main_dir, year.to_s, sprintf('day%02d', day))
     @day = day
     @year = year
     @http = http
     @headers = headers
   end
 
-  def needs_input?
-    return false if Time.new(year, 12, day) > Time.now
-    !File.exist?(input_file)
+  def run
+    mkdir
+    get_input
   end
 
-  def run
+  def mkdir
+    Dir.mkdir(dir)
+    rescue Errno::EEXIST
+  end
+
+  def needs_input?
+    return false if Time.new(year, 12, day) > Time.now
+    !(File.exist?(input_file) || File.exist?(input_file + '.txt'))
+  end
+
+  def get_input
     return unless needs_input?
     puts "Getting input for day #{day}, in #{year}"
     resp = http.get("/#{year}/day/#{day}/input", headers)
@@ -49,7 +72,16 @@ class SetupDay
   end
 
   def input_file
-    File.join(dir, year.to_s, sprintf('day%02d.input', day))
+    File.join(dir, 'input')
+  end
+end
+
+class SetupNewDay < SetupLegacyDay
+  def input_file
+    dir + '.input'
+  end
+
+  def mkdir
   end
 end
 
