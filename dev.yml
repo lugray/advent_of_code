@@ -1,0 +1,15 @@
+name: advent-of-code
+
+type:
+  - ruby
+
+packages: |
+  with import <nixpkgs> {};
+  let
+    ruby = ruby_2_6;
+  in buildEnv {
+    name = "project-environment";
+    paths = [
+      ruby
+    ];
+  }
