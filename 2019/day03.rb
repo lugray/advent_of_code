@@ -50,16 +50,13 @@ class Crosses
 
     @path1.each_segment do |x1, y1, dx1, dy1, s1|
       @path2.each_segment do |x2, y2, dx2, dy2, s2|
-        px1 = [x1, x1+dx1]
-        py1 = [y1, y1+dy1]
-        rx1 = px1.min..px1.max
-        ry1 = py1.min..py1.max
+        rx1 = sorted_range(x1, x1 + dx1)
+        ry1 = sorted_range(y1, y1 + dy1)
+        rx2 = sorted_range(x2, x2 + dx2)
+        ry2 = sorted_range(y2, y2 + dy2)
 
-        px2 = [x2, x2+dx2]
-        py2 = [y2, y2+dy2]
-        rx2 = px2.min..px2.max
-        ry2 = py2.min..py2.max
         s = s1 + s2 + (x2-x1).abs + (y2-y1).abs
+
         if rx2 === x1 && ry1 === y2
           yield(x1, y2, s)
         elsif rx1 === x2 && ry2 === y1
@@ -67,6 +64,12 @@ class Crosses
         end
       end
     end
+  end
+
+  private
+
+  def sorted_range(v1, v2)
+    [v1, v2].min..[v1, v2].max
   end
 end
 
