@@ -33,34 +33,34 @@ class Intcode
     loop do
       case @opcodes[@pointer] % 100
       when OPT_ADD
-        set_param(3, param(0) + param(1))
+        set_param(3, param(1) + param(2))
         @pointer += 4
       when OPT_MULTIPLY
-        set_param(3, param(0) * param(1))
+        set_param(3, param(1) * param(2))
         @pointer += 4
       when OPT_INPUT
         set_param(1, @inputs.shift)
         @pointer += 2
       when OPT_OUTPUT
-        puts param(0)
+        puts param(1)
         @pointer += 2
       when OPT_JUMP_IF_TRUE
-        if param(0) != 0
-          @pointer = param(1)
+        if param(1) != 0
+          @pointer = param(2)
         else
           @pointer += 3
         end
       when OPT_JUMP_IF_FALSE
-        if param(0) == 0
-          @pointer = param(1)
+        if param(1) == 0
+          @pointer = param(2)
         else
           @pointer += 3
         end
       when OPT_LESS_THAN
-        set_param(3, param(0) < param(1) ? 1 : 0)
+        set_param(3, param(1) < param(2) ? 1 : 0)
         @pointer += 4
       when OPT_EQUALS
-        set_param(3, param(0) == param(1) ? 1 : 0)
+        set_param(3, param(1) == param(2) ? 1 : 0)
         @pointer += 4
       when 99
         break
@@ -78,12 +78,12 @@ class Intcode
   private
 
   def param(n)
-    mode = @opcodes[@pointer].digits[n+2].to_i
+    mode = @opcodes[@pointer].digits[n+1].to_i
     case mode
     when 0
-      @opcodes[@opcodes[@pointer+1+n]]
+      @opcodes[@opcodes[@pointer + n]]
     when 1
-      @opcodes[@pointer+1+n]
+      @opcodes[@pointer + n]
     end
   end
 
