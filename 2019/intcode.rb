@@ -29,10 +29,34 @@ class Intcode
       when 2
         @opcodes[@opcodes[@pointer + 3]] = param(0) * param(1)
         @pointer += 4
+      when 3
+        @opcodes[@opcodes[@pointer + 1]] = @inputs.shift
+        @pointer += 2
+      when 4
+        puts param(0)
+        @pointer += 2
+      when 5
+        if param(0) != 0
+          @pointer = param(1)
+        else
+          @pointer += 3
+        end
+      when 6
+        if param(0) == 0
+          @pointer = param(1)
+        else
+          @pointer += 3
+        end
+      when 7
+        @opcodes[@opcodes[@pointer + 3]] = param(0) < param(1) ? 1 : 0
+        @pointer += 4
+      when 8
+        @opcodes[@opcodes[@pointer + 3]] = param(0) == param(1) ? 1 : 0
+        @pointer += 4
       when 99
         break
       else
-        raise "Unexpected opcode"
+        raise "Unexpected opcode: #{@opcodes[@pointer]}"
       end
     end
     self
