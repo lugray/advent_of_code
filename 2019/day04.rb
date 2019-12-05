@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require_relative 'aoc'
+require_relative 'day'
 
 class Integer
   def monotonic_increasing?
@@ -20,7 +20,7 @@ end
 
 class Day04 < Day
   def initialize
-    @range = Range.new(*AOC.input.split('-').map(&:to_i))
+    @range = Range.new(*input.split('-').map(&:to_i))
   end
 
   def part_1

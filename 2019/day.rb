@@ -1,12 +1,8 @@
-module AOC
-  class << self
-    def input
-      File.read("#{File.basename($0, '.rb')}.input")
-    end
-  end
-end
-
 class Day
+  def input
+    File.read("#{self.class.to_s.downcase}.input")
+  end
+
   class << self
     def run
       day = new

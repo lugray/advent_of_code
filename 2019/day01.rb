@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require_relative 'aoc'
+require_relative 'day'
 
 class Mod
   def initialize(n)
@@ -19,7 +19,7 @@ end
 
 class Day01 < Day
   def initialize
-    @modules = AOC.input.lines.map { |n| Mod.new(n.chomp.to_i) }
+    @modules = input.lines.map { |n| Mod.new(n.chomp.to_i) }
   end
 
   def part_1

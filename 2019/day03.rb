@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require_relative 'aoc'
+require_relative 'day'
 
 class Path
   def initialize(path_str)
@@ -75,7 +75,7 @@ end
 
 class Day03 < Day
   def initialize
-    @crosses = Crosses.new(AOC.input)
+    @crosses = Crosses.new(input)
   end
 
   def part_1
