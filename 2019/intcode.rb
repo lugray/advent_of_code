@@ -7,6 +7,7 @@ class Intcode
   OPT_JUMP_IF_FALSE = 6
   OPT_LESS_THAN = 7
   OPT_EQUALS = 8
+  OPT_BREAK = 99
 
   def initialize(opcodes)
     @opcodes = opcodes
@@ -62,7 +63,7 @@ class Intcode
       when OPT_EQUALS
         set_param(3, param(1) == param(2) ? 1 : 0)
         @pointer += 4
-      when 99
+      when OPT_BREAK
         break
       else
         raise "Unexpected opcode: #{@opcodes[@pointer]}"
