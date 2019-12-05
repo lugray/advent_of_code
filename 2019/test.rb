@@ -7,7 +7,7 @@ class TestDays < Minitest::Test
     define_method("test_#{f}") do
       basename = File.basename(f, '.rb')
       outfile = "#{basename}.output"
-      assert File.exist?(outfile), "Missing output file #{outfile}"
+      skip "Missing output file #{outfile}" unless File.exist?(outfile)
       require_relative basename
       assert_equal File.read(outfile), Object.const_get(basename.capitalize).output
     end
