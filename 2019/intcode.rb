@@ -24,13 +24,13 @@ class Intcode
     loop do
       case @opcodes[@pointer] % 100
       when 1
-        @opcodes[@opcodes[@pointer + 3]] = param(0) + param(1)
+        set_param(3, param(0) + param(1))
         @pointer += 4
       when 2
-        @opcodes[@opcodes[@pointer + 3]] = param(0) * param(1)
+        set_param(3, param(0) * param(1))
         @pointer += 4
       when 3
-        @opcodes[@opcodes[@pointer + 1]] = @inputs.shift
+        set_param(1, @inputs.shift)
         @pointer += 2
       when 4
         puts param(0)
@@ -48,10 +48,10 @@ class Intcode
           @pointer += 3
         end
       when 7
-        @opcodes[@opcodes[@pointer + 3]] = param(0) < param(1) ? 1 : 0
+        set_param(3, param(0) < param(1) ? 1 : 0)
         @pointer += 4
       when 8
-        @opcodes[@opcodes[@pointer + 3]] = param(0) == param(1) ? 1 : 0
+        set_param(3, param(0) == param(1) ? 1 : 0)
         @pointer += 4
       when 99
         break
@@ -76,5 +76,9 @@ class Intcode
     when 1
       @opcodes[@pointer+1+n]
     end
+  end
+
+  def set_param(n, val)
+    @opcodes[@opcodes[@pointer + n]] = val
   end
 end
