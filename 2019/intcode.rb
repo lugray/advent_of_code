@@ -9,8 +9,11 @@ class Intcode
   OPT_EQUALS = 8
   OPT_BREAK = 99
 
+  attr_reader :outputs
+
   def initialize(opcodes)
     @opcodes = opcodes
+    @outputs = []
   end
 
   def initialize_copy(_)
@@ -43,7 +46,7 @@ class Intcode
         set_param(1, @inputs.shift)
         @pointer += 2
       when OPT_OUTPUT
-        puts param(1)
+        @outputs.push(param(1))
         @pointer += 2
       when OPT_JUMP_IF_TRUE
         if param(1) != 0

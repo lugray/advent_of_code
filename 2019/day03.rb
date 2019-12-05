@@ -73,6 +73,18 @@ class Crosses
   end
 end
 
-crosses = Crosses.new(AOC.input)
-puts crosses.each.map { |x, y, _| x.abs + y.abs }.reject { |n| n.zero? }.min
-puts crosses.each.map { |_, _, s| s }.reject { |n| n.zero? }.min
+class Day03 < Day
+  def initialize
+    @crosses = Crosses.new(AOC.input)
+  end
+
+  def part_1
+    @crosses.each.map { |x, y, _| x.abs + y.abs }.reject { |n| n.zero? }.min
+  end
+
+  def part_2
+    @crosses.each.map { |_, _, s| s }.reject { |n| n.zero? }.min
+  end
+end
+
+Day03.run if __FILE__ == $0

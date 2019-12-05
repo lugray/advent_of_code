@@ -18,6 +18,18 @@ class Integer
   end
 end
 
-range = Range.new(*AOC.input.split('-').map(&:to_i))
-puts range.count { |n| n.monotonic_increasing? && n.has_double? }
-puts range.count { |n| n.monotonic_increasing? && n.has_strict_double? }
+class Day04 < Day
+  def initialize
+    @range = Range.new(*AOC.input.split('-').map(&:to_i))
+  end
+
+  def part_1
+    @range.count { |n| n.monotonic_increasing? && n.has_double? }
+  end
+
+  def part_2
+    @range.count { |n| n.monotonic_increasing? && n.has_strict_double? }
+  end
+end
+
+Day04.run if __FILE__ == $0

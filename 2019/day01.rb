@@ -17,6 +17,18 @@ class Mod
   end
 end
 
-modules = AOC.input.lines.map { |n| Mod.new(n.chomp.to_i) }
-puts modules.map(&:fuel).sum
-puts modules.map(&:full_fuel).sum
+class Day01 < Day
+  def initialize
+    @modules = AOC.input.lines.map { |n| Mod.new(n.chomp.to_i) }
+  end
+
+  def part_1
+    @modules.map(&:fuel).sum
+  end
+
+  def part_2
+    @modules.map(&:full_fuel).sum
+  end
+end
+
+Day01.run if __FILE__ == $0
