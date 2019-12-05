@@ -1,4 +1,13 @@
 class Intcode
+  OPT_ADD = 1
+  OPT_MULTIPLY = 2
+  OPT_INPUT = 3
+  OPT_OUTPUT = 4
+  OPT_JUMP_IF_TRUE = 5
+  OPT_JUMP_IF_FALSE = 6
+  OPT_LESS_THAN = 7
+  OPT_EQUALS = 8
+
   def initialize(opcodes)
     @opcodes = opcodes
   end
@@ -23,34 +32,34 @@ class Intcode
     @pointer = 0
     loop do
       case @opcodes[@pointer] % 100
-      when 1
+      when OPT_ADD
         set_param(3, param(0) + param(1))
         @pointer += 4
-      when 2
+      when OPT_MULTIPLY
         set_param(3, param(0) * param(1))
         @pointer += 4
-      when 3
+      when OPT_INPUT
         set_param(1, @inputs.shift)
         @pointer += 2
-      when 4
+      when OPT_OUTPUT
         puts param(0)
         @pointer += 2
-      when 5
+      when OPT_JUMP_IF_TRUE
         if param(0) != 0
           @pointer = param(1)
         else
           @pointer += 3
         end
-      when 6
+      when OPT_JUMP_IF_FALSE
         if param(0) == 0
           @pointer = param(1)
         else
           @pointer += 3
         end
-      when 7
+      when OPT_LESS_THAN
         set_param(3, param(0) < param(1) ? 1 : 0)
         @pointer += 4
-      when 8
+      when OPT_EQUALS
         set_param(3, param(0) == param(1) ? 1 : 0)
         @pointer += 4
       when 99
