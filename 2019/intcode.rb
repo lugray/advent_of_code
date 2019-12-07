@@ -13,10 +13,14 @@ class Intcode
 
   def initialize(opcodes)
     @opcodes = opcodes
+    @pointer = 0
+    @done = false
+    @inputs = []
     @outputs = []
   end
 
   def initialize_copy(_)
+    @pointer = 0
     @opcodes = @opcodes.dup
   end
 
@@ -28,12 +32,11 @@ class Intcode
   end
 
   def with_inputs(*inputs)
-    @inputs = inputs
+    @inputs += inputs
     self
   end
 
-  def run
-    @pointer = 0
+  def run(until_output: false)
     loop do
       case @opcodes[@pointer] % 100
       when OPT_ADD
@@ -43,11 +46,13 @@ class Intcode
         set_param(3, param(1) * param(2))
         @pointer += 4
       when OPT_INPUT
+        break if @inputs.empty?
         set_param(1, @inputs.shift)
         @pointer += 2
       when OPT_OUTPUT
         @outputs.push(param(1))
         @pointer += 2
+        break if until_output
       when OPT_JUMP_IF_TRUE
         if param(1) != 0
           @pointer = param(2)
@@ -67,12 +72,17 @@ class Intcode
         set_param(3, param(1) == param(2) ? 1 : 0)
         @pointer += 4
       when OPT_BREAK
+        @done = true
         break
       else
         raise "Unexpected opcode: #{@opcodes[@pointer]}"
       end
     end
     self
+  end
+
+  def done?
+    @done
   end
 
   def value_at(n)
