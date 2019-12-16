@@ -24,6 +24,8 @@ class Intcode
   def initialize_copy(_)
     @pointer = 0
     @opcodes = @opcodes.dup
+    @inputs = @inputs.dup
+    @outputs = @outputs.dup
   end
 
   def with(replacements)
