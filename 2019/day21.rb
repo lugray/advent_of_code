@@ -7,10 +7,10 @@ class Day21 < Day
   def springscript(program)
     intcode = Intcode.new(input.split(',').map(&:to_i))
     intcode.run
-    print intcode.outputs.map(&:chr).join
+    # print intcode.outputs.map(&:chr).join
     intcode.outputs.clear
     intcode.with_inputs(*program.each_char.map(&:ord)).run
-    print intcode.outputs.select { |i| i < 256 }.map(&:chr).join
+    # print intcode.outputs.select { |i| i < 256 }.map(&:chr).join
     intcode.outputs.last
   end
   

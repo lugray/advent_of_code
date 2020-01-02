@@ -11,6 +11,7 @@ class TestDays < Minitest::Test
       skip "Too long" if basename == 'day12'
       skip "Too long" if basename == 'day16'
       skip "Too long" if basename == 'day18'
+      skip "Too long" if basename == 'day20'
       require_relative basename
       assert_equal File.read(outfile), Object.const_get(basename.capitalize).output
     end
