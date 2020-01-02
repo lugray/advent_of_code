@@ -10,6 +10,9 @@ class Intcode
   OPT_ADJUST_RELATIVE_BASE = 9
   OPT_BREAK = 99
 
+  class NoInput < StandardError; end
+  class Output < StandardError; end
+
   attr_reader :outputs
 
   def initialize(opcodes)
@@ -40,50 +43,59 @@ class Intcode
     self
   end
 
+  def step(raise_on_output: false)
+    case @opcodes[@pointer] % 100
+    when OPT_ADD
+      set_param(3, param(1) + param(2))
+      @pointer += 4
+    when OPT_MULTIPLY
+      set_param(3, param(1) * param(2))
+      @pointer += 4
+    when OPT_INPUT
+      raise NoInput if @inputs.empty?
+      set_param(1, @inputs.shift)
+      @pointer += 2
+    when OPT_OUTPUT
+      @outputs.push(param(1))
+      @pointer += 2
+      raise Output if raise_on_output
+    when OPT_JUMP_IF_TRUE
+      if param(1) != 0
+        @pointer = param(2)
+      else
+        @pointer += 3
+      end
+    when OPT_JUMP_IF_FALSE
+      if param(1) == 0
+        @pointer = param(2)
+      else
+        @pointer += 3
+      end
+    when OPT_LESS_THAN
+      set_param(3, param(1) < param(2) ? 1 : 0)
+      @pointer += 4
+    when OPT_EQUALS
+      set_param(3, param(1) == param(2) ? 1 : 0)
+      @pointer += 4
+    when OPT_BREAK
+      @done = true
+    when OPT_ADJUST_RELATIVE_BASE
+      @relative_base += param(1)
+      @pointer += 2
+    else
+      raise "Unexpected opcode: #{@opcodes[@pointer]}"
+    end
+    self
+  end
+
   def run(until_output: false)
     loop do
-      case @opcodes[@pointer] % 100
-      when OPT_ADD
-        set_param(3, param(1) + param(2))
-        @pointer += 4
-      when OPT_MULTIPLY
-        set_param(3, param(1) * param(2))
-        @pointer += 4
-      when OPT_INPUT
-        break if @inputs.empty?
-        set_param(1, @inputs.shift)
-        @pointer += 2
-      when OPT_OUTPUT
-        @outputs.push(param(1))
-        @pointer += 2
-        break if until_output
-      when OPT_JUMP_IF_TRUE
-        if param(1) != 0
-          @pointer = param(2)
-        else
-          @pointer += 3
-        end
-      when OPT_JUMP_IF_FALSE
-        if param(1) == 0
-          @pointer = param(2)
-        else
-          @pointer += 3
-        end
-      when OPT_LESS_THAN
-        set_param(3, param(1) < param(2) ? 1 : 0)
-        @pointer += 4
-      when OPT_EQUALS
-        set_param(3, param(1) == param(2) ? 1 : 0)
-        @pointer += 4
-      when OPT_BREAK
-        @done = true
-        break
-      when OPT_ADJUST_RELATIVE_BASE
-        @relative_base += param(1)
-        @pointer += 2
-      else
-        raise "Unexpected opcode: #{@opcodes[@pointer]}"
-      end
+      break if done?
+      step(raise_on_output: until_output)
+    rescue NoInput
+      break
+    rescue Output
+      break
     end
     self
   end
