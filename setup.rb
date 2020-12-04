@@ -36,20 +36,31 @@ class SetupDay
     @headers = headers
   end
 
-  def needs_input?
-    return false if Time.new(year, 12, day) > Time.now
-    !File.exist?(input_file)
-  end
-
   def run
-    return unless needs_input?
-    puts "Getting input for day #{day}, in #{year}"
-    resp = http.get("/#{year}/day/#{day}/input", headers)
-    File.write(input_file, resp.body)
+    return if Time.new(year, 12, day) > Time.now
+    unless File.exist?(input_file)
+      puts "Getting input for day #{day}, in #{year}"
+      resp = http.get("/#{year}/day/#{day}/input", headers)
+      File.write(input_file, resp.body)
+    end
+    return if Time.new(year, 12, 30) < Time.now # Don't generate for previous years
+    unless File.exist?(day_file)
+      puts "Generating template for day #{day}, in #{year}"
+      File.write(day_file, File.read(template_file).gsub('###', day.to_s.rjust(2, '0')))
+      File.chmod(0755, day_file)
+    end
   end
 
   def input_file
     File.join(dir, year.to_s, sprintf('day%02d.input', day))
+  end
+
+  def day_file
+    File.join(dir, year.to_s, sprintf('day%02d.rb', day))
+  end
+
+  def template_file
+    File.join(dir, 'day_template.rb')
   end
 end
 
