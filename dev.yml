@@ -6,7 +6,7 @@ type:
 packages: |
   with import <nixpkgs> {};
   let
-    ruby = ruby_2_6;
+    ruby = ruby_2_7;
   in buildEnv {
     name = "project-environment";
     paths = [
