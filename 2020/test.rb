@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 
 require "minitest/autorun"
+require "minitest/reporters"
+
+Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
 class TestDays < Minitest::Test
   Dir.glob(File.join(File.dirname(__FILE__), 'day??.rb')).sort.each do |f|
