@@ -63,7 +63,7 @@ class SeatLife
 
   def surround_count_lte(r, c, max)
     count = 0
-    DIRECTIONS.each do |(dr, dc)|
+    DIRECTIONS.each_with_index do |(dr, dc), i|
       m = 1
       if @sightline
         while status(r + m * dr, c + m * dc) == '.'
@@ -73,6 +73,9 @@ class SeatLife
       if status(r + m * dr, c + m * dc) == '#'
         count += 1
         return false if count > max
+      elsif count + 7 - i <= max
+        # Even if all remaining were occupied, it wouldn't be enough.
+        return true
       end
     end
     true
