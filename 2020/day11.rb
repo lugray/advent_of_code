@@ -25,16 +25,14 @@ class SeatLife
         when '.'
           '.'
         when 'L'
-          case surround_count(r, c)
-          when 0
+          if surround_count_lte(r, c, 0)
             changed = true
             '#'
           else
             'L'
           end
         when '#'
-          case surround_count(r, c)
-          when (0..@max_neighbour)
+          if surround_count_lte(r, c, @max_neighbour)
             '#'
           else
             changed = true
@@ -63,16 +61,21 @@ class SeatLife
     @seats.fetch(r, []).fetch(c, ' ')
   end
 
-  def surround_count(r, c)
-    DIRECTIONS.count do |(dr, dc)|
+  def surround_count_lte(r, c, max)
+    count = 0
+    DIRECTIONS.each do |(dr, dc)|
       m = 1
       if @sightline
         while status(r + m * dr, c + m * dc) == '.'
           m += 1
         end
       end
-      status(r + m * dr, c + m * dc) == '#'
+      if status(r + m * dr, c + m * dc) == '#'
+        count += 1
+        return false if count > max
+      end
     end
+    true
   end
 end
 
