@@ -1,11 +1,14 @@
 #!/usr/bin/env ruby
 
 require_relative 'day'
-require 'matrix'
 
 class SeatLife
-  def initialize(input)
+  DIRECTIONS = (-1..1).to_a.product((-1..1).to_a) - [[0,0]]
+
+  def initialize(input, sightline: false, max_neighbour: 3)
     @seats = input.each_line.map { |l| l.chomp.each_char.to_a }
+    @sightline = sightline
+    @max_neighbour = max_neighbour
     @rows = @seats.size
     @cols = @seats.first.size
   end
@@ -31,7 +34,7 @@ class SeatLife
           end
         when '#'
           case surround_count(r, c)
-          when (0..3)
+          when (0..@max_neighbour)
             '#'
           else
             changed = true
@@ -55,88 +58,20 @@ class SeatLife
     @seats.sum { |r| r.count { |s| s == '#' } }
   end
 
-  def surround_count(r, c)
-    rmin = [0, r-1].max
-    rmax = [r+1, @rows-1].min
-    cmin = [0, c-1].max
-    cmax = [c+1, @cols-1].min
-    count = (rmin..rmax).sum do |sr|
-      (cmin..cmax).count do |sc|
-        @seats[sr][sc] == '#'
-      end
-    end
-    count -= 1 if @seats[r][c] == '#'
-    count
-  end
-end
-
-class SightlineSeatLife
-  def initialize(input)
-    @seats = input.each_line.map { |l| l.chomp.each_char.to_a }
-    @rows = @seats.size
-    @cols = @seats.first.size
-  end
-
-  def to_s
-    @seats.map(&:join).join("\n")
-  end
-
-  def step
-    changed = false
-    @seats = @rows.times.map do |r|
-      @cols.times.map do |c|
-        case @seats[r][c]
-        when '.'
-          '.'
-        when 'L'
-          case surround_count(r, c)
-          when 0
-            changed = true
-            '#'
-          else
-            'L'
-          end
-        when '#'
-          case surround_count(r, c)
-          when (0..4)
-            '#'
-          else
-            changed = true
-            'L'
-          end
-        else
-          raise "Seat #{r},#{c} has unexpected contents: #{@seats[r][c]}"
-        end
-      end
-    end
-    changed
-  end
-
-  def run_to_stable
-    while step do
-    end
-    self
-  end
-
-  def occupied_count
-    @seats.sum { |r| r.count { |s| s == '#' } }
-  end
-
-  def status(vector)
-    r, c = vector.to_a
+  def status(r, c)
     return ' ' if r < 0 || c < 0
     @seats.fetch(r, []).fetch(c, ' ')
   end
 
   def surround_count(r, c)
-    start = Vector[r, c]
-    directions = ((-1..1).to_a.product((-1..1).to_a) - [[0,0]]).map(&Vector.method(:new))
-    directions.count do |dir|
+    DIRECTIONS.count do |(dr, dc)|
       m = 1
-      while status(start + m * dir) == '.'
-        m += 1
+      if @sightline
+        while status(r + m * dr, c + m * dc) == '.'
+          m += 1
+        end
       end
-      status(start + m * dir) == '#'
+      status(r + m * dr, c + m * dc) == '#'
     end
   end
 end
@@ -150,7 +85,7 @@ class Day11 < Day
   end
 
   def part_2
-    SightlineSeatLife.new(input).run_to_stable.occupied_count
+    SeatLife.new(input, sightline: true, max_neighbour: 4).run_to_stable.occupied_count
   end
 
   def input
