@@ -93,22 +93,6 @@ class Day11 < Day
   def part_2
     SeatLife.new(input, sightline: true, max_neighbour: 4).run_to_stable.occupied_count
   end
-
-  def input
-    return super
-    <<~INPUT
-      L.LL.LL.LL
-      LLLLLLL.LL
-      L.L.L..L..
-      LLLL.LL.LL
-      L.LL.LL.LL
-      L.LLLLL.LL
-      ..L.L.....
-      LLLLLLLLLL
-      L.LLLLLL.L
-      L.LLLLL.LL
-    INPUT
-  end
 end
 
 Day11.run if __FILE__ == $0
