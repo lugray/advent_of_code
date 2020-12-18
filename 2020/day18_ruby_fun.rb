@@ -3,19 +3,12 @@
 require_relative 'day'
 
 class Integer
-  alias_method :original_m, :*
-  alias_method :original_p, :+
-
-  def *(other)
-   original_p(other)
+  def /(other) # Becomes + with multiplication precedence
+    self + other
   end
 
-  def +(other)
-   original_m(other)
-  end
-
-  def -(other)
-    original_p(other)
+  def -(other) # Becomes * with addition precedence
+    self * other
   end
 end
 
@@ -25,11 +18,11 @@ class Day18 < Day
   end
 
   def part_1
-    @calculations.sum { |c| eval(c.gsub(/[*+]/, { '*' => '+', '+' => '-' })) }
+    @calculations.sum { |c| eval(c.gsub('*', '-')) }
   end
 
   def part_2
-    @calculations.sum { |c| eval(c.gsub(/[*+]/, { '*' => '+', '+' => '*' })) }
+    @calculations.sum { |c| eval(c.gsub(/[*+]/, { '*' => '-', '+' => '/' })) }
   end
 end
 
