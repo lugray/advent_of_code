@@ -1,15 +1,5 @@
 name: advent-of-code
 
-type:
-  - ruby
-
-packages: |
-  with import <nixpkgs> {};
-  let
-    ruby = ruby_2_7;
-  in buildEnv {
-    name = "project-environment";
-    paths = [
-      ruby
-    ];
-  }
+up:
+  - ruby: 3.0.3
+  - bundler
