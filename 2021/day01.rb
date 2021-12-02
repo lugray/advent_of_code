@@ -4,7 +4,7 @@ require_relative 'day'
 
 class Day01 < Day
   def initialize
-    @depths = input.each_line.map(&:to_i)
+    @depths = input_numbers
   end
 
   def part_1

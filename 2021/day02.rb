@@ -4,7 +4,7 @@ require_relative 'day'
 
 class Day02 < Day
   def initialize
-    @movements = input.each_line.map do |l|
+    @movements = input_lines.map do |l|
       a, b = l.split(' ')
       [a, b.to_i]
     end

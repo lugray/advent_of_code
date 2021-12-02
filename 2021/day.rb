@@ -3,6 +3,14 @@ class Day
     File.read("#{self.class.to_s.downcase}.input")
   end
 
+  def input_lines
+    input.each_line.map(&:chomp)
+  end
+
+  def input_numbers
+    input_lines.map(&:to_i)
+  end
+
   class << self
     def run
       day = new
