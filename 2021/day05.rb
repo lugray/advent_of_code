@@ -21,7 +21,8 @@ class Day05 < Day
       x1 == x2
     end
 
-    def each_point
+    def points
+      return enum_for(:points).to_a unless block_given?
       delta_x = x2 <=> x1
       delta_y = y2 <=> y1
       size = [(x2 - x1).abs, (y2 - y1).abs].max
@@ -41,12 +42,7 @@ class Day05 < Day
   end
 
   def count_overlaps(vents)
-    vent_counts = Hash.new { 0 }
-    vents.each do |v|
-      v.each_point { |p| vent_counts[p] += 1 }
-    end
-
-    vent_counts.count { |_, v| v > 1 }
+    vents.flat_map(&:points).tally.count { |_, c| c > 1 }
   end
 
   def part_1
