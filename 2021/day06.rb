@@ -1,30 +1,38 @@
 #!/usr/bin/env ruby
 
 require_relative 'day'
+require 'matrix'
 
 class Day06 < Day
   def initialize
-    @fish = input.split(',').map(&:to_i).tally
+    fish_arr = input.split(',').map(&:to_i).each_with_object(Array.new(9) { 0 }) do |timer, arr|
+      arr[timer] += 1
+    end
+    @fish = Vector[*fish_arr].to_matrix
+    @matrix = Matrix[
+      [0, 1, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 1, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 1, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 1, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 1, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 1, 0, 0],
+      [1, 0, 0, 0, 0, 0, 0, 1, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0],
+    ]
   end
 
-  def next_gen
-    @fish = @fish.transform_keys { |age, _count| age - 1 }
-    if @fish[-1]
-      @fish[8] = @fish[-1]
-      @fish[6] = @fish.fetch(6, 0) + @fish[-1]
-      @fish.delete(-1)
-    end
+  def count_after(days)
+    (@matrix**days * @fish).to_a.flatten.sum
   end
+
 
   def part_1
-    80.times { next_gen }
-    @fish.sum { |_timer, count| count }
+    count_after(80)
   end
 
   def part_2
-    initialize
-    256.times { next_gen }
-    @fish.sum { |_timer, count| count }
+    count_after(256)
   end
 end
 
