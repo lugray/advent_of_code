@@ -28,7 +28,6 @@ class Day06 < Day
     (@matrix**days * @fish).to_a.flatten.sum
   end
 
-
   def part_1
     count_after(80)
   end
