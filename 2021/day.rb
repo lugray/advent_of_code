@@ -8,7 +8,11 @@ class Day
   end
 
   def input_numbers
-    input_lines.map(&:to_i)
+    if input.include?(',')
+      input.split(',').map(&:to_i)
+    else
+      input_lines.map(&:to_i)
+    end
   end
 
   class << self
