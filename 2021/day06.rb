@@ -5,7 +5,7 @@ require 'matrix'
 
 class Day06 < Day
   def initialize
-    fish_arr = input.split(',').map(&:to_i).each_with_object(Array.new(9) { 0 }) do |timer, arr|
+    fish_arr = input_numbers.each_with_object(Array.new(9) { 0 }) do |timer, arr|
       arr[timer] += 1
     end
     @fish = Vector[*fish_arr].to_matrix
