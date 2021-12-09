@@ -22,24 +22,24 @@ class Day24 < Day
     end
   end
 
+  def best_qe(set, n)
+    qe(
+      groups(set, set.sum / n).min do |g1, g2|
+        (g1.size <=> g2.size).nonzero? || (qe(g1) <=> qe(g2))
+      end
+    )
+  end
+
   def qe(g)
     g.inject(&:*)
   end
 
   def part_1
-    qe(
-      groups(@weights, @weights.sum / 3).min do |g1, g2|
-        (g1.size <=> g2.size).nonzero? || (qe(g1) <=> qe(g2))
-      end
-    )
+    best_qe(@weights, 3)
   end
 
   def part_2
-    qe(
-      groups(@weights, @weights.sum / 4).min do |g1, g2|
-        (g1.size <=> g2.size).nonzero? || (qe(g1) <=> qe(g2))
-      end
-    )
+    best_qe(@weights, 4)
   end
 end
 
