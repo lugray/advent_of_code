@@ -19,6 +19,7 @@ class Day24 < Day
       next if elem > target
       groups(set[i+1..], target - elem, max_size - 1).each do |inner_set|
         yield Set.new([elem]) + inner_set
+        max_size = [max_size, inner_set.size + 1].min
       end
     end
   end
