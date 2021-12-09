@@ -26,7 +26,7 @@ class Day24 < Day
 
   def best_qe(set, n)
     qe(
-      groups(set, set.sum / n, set.size / n).min do |g1, g2|
+      groups(set.sort.reverse, set.sum / n, set.size / n).min do |g1, g2|
         (g1.size <=> g2.size).nonzero? || (qe(g1) <=> qe(g2))
       end
     )
