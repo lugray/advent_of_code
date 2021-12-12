@@ -4,20 +4,15 @@ require_relative 'day'
 
 class Day12 < Day
   class Path
-    def initialize(connections, nodes = ['start'], has_revisit = false, with_one_revisit: false)
+    def initialize(connections, nodes: ['start'], allow_revisit: false)
       @connections = connections
       @nodes = nodes
-      @has_revisit = has_revisit
-      @with_one_revisit = with_one_revisit
+      @allow_revisit = allow_revisit
     end
 
     def next_valids
       @connections[@nodes.last].reject do |node|
-        if @with_one_revisit
-          node == 'start' || (@has_revisit && is_revisit?(node))
-        else
-          is_revisit?(node)
-        end
+        (!@allow_revisit && is_revisit?(node)) || node == 'start'
       end
     end
 
@@ -27,7 +22,7 @@ class Day12 < Day
     end
 
     def extend_by(node)
-      Path.new(@connections, @nodes + [node], @has_revisit || is_revisit?(node), with_one_revisit: @with_one_revisit)
+      Path.new(@connections, nodes: @nodes + [node], allow_revisit: @allow_revisit && !is_revisit?(node))
     end
 
     def is_revisit?(node)
@@ -54,7 +49,7 @@ class Day12 < Day
   end
 
   def part_2
-    Path.new(@connections, with_one_revisit: true).extensions.count
+    Path.new(@connections, allow_revisit: true).extensions.count
   end
 end
 
