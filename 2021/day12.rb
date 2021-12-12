@@ -4,35 +4,38 @@ require_relative 'day'
 
 class Day12 < Day
   class Path
-    def initialize(connections, nodes = ['start'], has_revisit = false)
+    def initialize(connections, nodes = ['start'], has_revisit = false, with_one_revisit: false)
       @connections = connections
       @nodes = nodes
-      @has_revisit = has_revisit || last_is_revisit?
-    end
-
-    def last_is_revisit?
-      small?(@nodes.last) && @nodes[0..-2].include?(@nodes.last)
+      @has_revisit = has_revisit
+      @with_one_revisit = with_one_revisit
     end
 
     def small?(node)
       node.downcase == node
     end
 
-    def next_valids(with_one_revisit:)
+    def next_valids
       @connections[@nodes.last].reject do |node|
-        if with_one_revisit
-          node == 'start' || (@has_revisit && small?(node) && @nodes.include?(node))
+        if @with_one_revisit
+          node == 'start' || (@has_revisit && is_revisit?(node))
         else
-          small?(node) && @nodes.include?(node)
+          is_revisit?(node)
         end
       end
     end
 
     def extensions(with_one_revisit: false)
       return [self] if done?
-      next_valids(with_one_revisit: with_one_revisit).flat_map do |n|
-        Path.new(@connections, @nodes + [n], @has_revisit).extensions(with_one_revisit: with_one_revisit)
-      end
+      next_valids.flat_map { |n| extend_by(n).extensions }
+    end
+
+    def extend_by(node)
+      Path.new(@connections, @nodes + [node], @has_revisit || is_revisit?(node), with_one_revisit: @with_one_revisit)
+    end
+
+    def is_revisit?(node)
+      small?(node) && @nodes.include?(node)
     end
 
     def done?
@@ -55,7 +58,7 @@ class Day12 < Day
   end
 
   def part_2
-    Path.new(@connections).extensions(with_one_revisit: true).count
+    Path.new(@connections, with_one_revisit: true).extensions.count
   end
 end
 
