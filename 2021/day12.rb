@@ -21,7 +21,7 @@ class Day12 < Day
       end
     end
 
-    def extensions(with_one_revisit: false)
+    def extensions
       return [self] if done?
       next_valids.flat_map { |n| extend_by(n).extensions }
     end
