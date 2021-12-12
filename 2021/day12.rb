@@ -11,10 +11,6 @@ class Day12 < Day
       @with_one_revisit = with_one_revisit
     end
 
-    def small?(node)
-      node.downcase == node
-    end
-
     def next_valids
       @connections[@nodes.last].reject do |node|
         if @with_one_revisit
@@ -35,7 +31,7 @@ class Day12 < Day
     end
 
     def is_revisit?(node)
-      small?(node) && @nodes.include?(node)
+      node.downcase == node && @nodes.include?(node)
     end
 
     def done?
