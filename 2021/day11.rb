@@ -41,21 +41,8 @@ class Day11 < Day
     flashes
   end
 
-  def to_s
-    (0..9).map do |y|
-      (0..9).map do |x|
-        @energies[[x, y]].to_s
-      end.join
-    end.join("\n")
-  end
-
   def part_1
     100.times.sum { step }
-    # puts to_s
-    # puts step
-    # puts to_s
-    # puts step
-    # puts to_s
   end
 
   def part_2
@@ -63,21 +50,6 @@ class Day11 < Day
       return n+100 if step == 100
     end
   end
-
-  # def input
-  #   <<~I
-  #     5483143223
-  #     2745854711
-  #     5264556173
-  #     6141336146
-  #     6357385478
-  #     4167524645
-  #     2176841721
-  #     6882881134
-  #     4846848554
-  #     5283751526
-  #   I
-  # end
 end
 
 Day11.run if __FILE__ == $0
