@@ -29,13 +29,10 @@ class Day12 < Day
     end
 
     def extensions(with_one_revisit: false)
-      return self if done?
-      next_valids(with_one_revisit: with_one_revisit).map { |n| Path.new(@connections, @nodes + [n], @has_revisit) }
-    end
-
-    def extend_to_done(with_one_revisit: false)
-      return self if done?
-      extensions(with_one_revisit: with_one_revisit).flat_map { |p| p.extend_to_done(with_one_revisit: with_one_revisit) }
+      return [self] if done?
+      next_valids(with_one_revisit: with_one_revisit).flat_map do |n|
+        Path.new(@connections, @nodes + [n], @has_revisit).extensions(with_one_revisit: with_one_revisit)
+      end
     end
 
     def done?
@@ -54,11 +51,11 @@ class Day12 < Day
   end
 
   def part_1
-    Path.new(@connections).extend_to_done.count
+    Path.new(@connections).extensions.count
   end
 
   def part_2
-    Path.new(@connections).extend_to_done(with_one_revisit: true).count
+    Path.new(@connections).extensions(with_one_revisit: true).count
   end
 end
 
