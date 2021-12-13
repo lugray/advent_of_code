@@ -5,36 +5,17 @@ require_relative 'day'
 class Day13 < Day
   def initialize
     points, folds = input.split("\n\n")
-    @points = points.each_line.map do |l|
-      l.chomp.split(',').map(&:to_i)
-    end
+    @points = points.each_line.map { |l| l.chomp.split(',').map(&:to_i) }
     @folds = folds.each_line.map do |l|
-      c, v = l.split(' ').last.split('=')
-      [c, v.to_i]
+      l.split(' ').last.split('=').yield_self { |c, v| [c == 'x' ? 0 : 1, v.to_i] }
     end
   end
 
   def fold(points, fold)
     c, v = fold
-    case c
-    when 'x'
-      points.map do |(x, y)|
-        if x < v
-          [x, y]
-        else
-          [2 * v - x, y]
-        end
-      end
-    when 'y'
-      points.map do |(x, y)|
-        if y < v
-          [x, y]
-        else
-          [x, 2 * v - y]
-        end
-      end
-    else
-      raise 'wut'
+    points.map do |p|
+      next p if p[c] < v
+      p.dup.tap { |p| p[c] = 2 * v - p[c] }
     end.uniq
   end
 
@@ -44,12 +25,10 @@ class Day13 < Day
 
   def part_2
     points = @points
-    @folds.each do |fold|
-      points = fold(points, fold)
-    end
+    @folds.each { |fold| points = fold(points, fold) }
     Range.new(*points.map(&:last).minmax).map do |y|
       Range.new(*points.map(&:first).minmax).map do |x|
-        points.include?([x, y]) ? '#' : ' '
+        points.include?([x, y]) ? '█' : ' '
       end.join
     end.join("\n")
   end
