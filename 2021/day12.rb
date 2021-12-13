@@ -3,37 +3,6 @@
 require_relative 'day'
 
 class Day12 < Day
-  class Path
-    def initialize(connections, nodes: ['start'], allow_revisit: false)
-      @connections = connections
-      @nodes = nodes
-      @allow_revisit = allow_revisit
-    end
-
-    def next_valids
-      @connections[@nodes.last].reject do |node|
-        (!@allow_revisit && is_revisit?(node)) || node == 'start'
-      end
-    end
-
-    def extensions
-      return [self] if done?
-      next_valids.flat_map { |n| extend_by(n).extensions }
-    end
-
-    def extend_by(node)
-      Path.new(@connections, nodes: @nodes + [node], allow_revisit: @allow_revisit && !is_revisit?(node))
-    end
-
-    def is_revisit?(node)
-      node.downcase == node && @nodes.include?(node)
-    end
-
-    def done?
-      @nodes.last == 'end'
-    end
-  end
-
   def initialize
     @connections = input_lines.each_with_object({}) do |line, h|
       a, b = line.split('-')
@@ -44,12 +13,24 @@ class Day12 < Day
     end
   end
 
+  def count_paths(node = 'start', small_visited = [], allow_revisit: false)
+    return 1 if node == 'end'
+    small_visited = small_visited + [node] if node.downcase == node
+    @connections[node].sum do |n|
+      if (!allow_revisit && small_visited.include?(n)) || n == 'start'
+        0
+      else
+        count_paths(n, small_visited, allow_revisit: allow_revisit && !small_visited.include?(n))
+      end
+    end
+  end
+
   def part_1
-    Path.new(@connections).extensions.count
+    count_paths
   end
 
   def part_2
-    Path.new(@connections, allow_revisit: true).extensions.count
+    count_paths(allow_revisit: true)
   end
 end
 
