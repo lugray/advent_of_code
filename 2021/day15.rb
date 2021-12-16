@@ -16,6 +16,20 @@ class Day15 < Day
       end || size
       insert(i, elem)
     end
+
+    def delete(elem)
+      elem_sort_val = @sort_by_fn.call(elem)
+      i = bsearch_index do |e|
+        @sort_by_fn.call(e) >= elem_sort_val
+      end
+      return unless i
+      loop do
+        break delete_at(i) if at(i) == elem
+        i += 1
+        break if i >= size
+        break if @sort_by_fn.call(at(i)) > elem_sort_val
+      end
+    end
   end
 
   def initialize
@@ -29,8 +43,7 @@ class Day15 < Day
     @ltr[0][0] = 0
     sx = @ltr.size
     sy = @ltr.first.size
-    node_arr = (0...sx).flat_map { |x| (0...sy).map { |y| [x, y] } }
-    nodes = SortedList.new(node_arr) { |(x, y)| @ltr[x][y] }
+    nodes = SortedList.new([[0,0]]) { |(x, y)| @ltr[x][y] }
 
     until nodes.empty? do
       node = nodes.shift
@@ -47,8 +60,9 @@ class Day15 < Day
         next if nx >= sx
         next if ny >= sy
         next unless @ltr[x][y] + @risk[nx][ny] < @ltr[nx][ny]
+        nodes.delete([nx, ny])
         @ltr[nx][ny] = @ltr[x][y] + @risk[nx][ny]
-        nodes << nodes.delete([nx, ny])
+        nodes << [nx, ny]
       end
     end
     @ltr[-1][-1]
