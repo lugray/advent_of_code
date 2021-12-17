@@ -21,10 +21,12 @@ class Day17 < Day
   end
 
   def lands?(vx, vy)
+    # minimum for t from time to arrive in x without drag
+    # maximum for t from time to drop past last line after max height
     (@x_min/vx..2*@y_min.abs + 1).any? do |t|
       x = x(vx, t)
       y = y(vy, t)
-      return false if y < @y_min
+      return false if y < @y_min # We've already gone too far
       @xr.include?(x) && @yr.include?(y)
     end
   end
@@ -34,8 +36,8 @@ class Day17 < Day
   end
 
   def part_2
-    vx_min = (Integer.sqrt(8*@x_min + 1) - 1) / 2
-    (@y_min..-@y_min).sum do |vy|
+    vx_min = (Integer.sqrt(8*@x_min + 1) - 1) / 2 # From quadratic formula on x(vx, vx) == @x_min, since x maxes out at t=vx
+    (@y_min..-@y_min).sum do |vy| # Shoot straight to last line in one step/to max height before dropping to last line
       (vx_min..@x_max).count { |vx| lands?(vx, vy) }
     end
   end
