@@ -22,38 +22,19 @@ class Day16 < Day
         attr_accessor :operator
 
         def class_for_op(&block)
-          klass = Class.new(OperatorPacket)
-          klass.operator = block
-          klass
-        end
-
-        def class_type(type)
-          case type
-          when 0
-            SumPacket
-          when 1
-            ProductPacket
-          when 2
-            MinPacket
-          when 3
-            MaxPacket
-          when 5
-            GreaterThanPacket
-          when 6
-            LessThanPacket
-          when 7
-            EqualsPacket
-          end
+          Class.new(OperatorPacket).tap { |k| k.operator = block }
         end
       end
 
-      SumPacket = class_for_op { |values| values.sum }
-      ProductPacket = class_for_op { |values| values.inject(&:*) }
-      MinPacket = class_for_op { |values| values.min }
-      MaxPacket = class_for_op { |values| values.max }
-      GreaterThanPacket = class_for_op { |values| values.inject(&:>) ? 1 : 0 }
-      LessThanPacket = class_for_op { |values| values.inject(&:<) ? 1 : 0 }
-      EqualsPacket = class_for_op { |values| values.inject(&:==) ? 1 : 0 }
+      CLASS_TYPE = {
+        0 => SumPacket = class_for_op { |values| values.sum },
+        1 => ProductPacket = class_for_op { |values| values.inject(&:*) },
+        2 => MinPacket = class_for_op { |values| values.min },
+        3 => MaxPacket = class_for_op { |values| values.max },
+        5 => GreaterThanPacket = class_for_op { |values| values.inject(&:>) ? 1 : 0 },
+        6 => LessThanPacket = class_for_op { |values| values.inject(&:<) ? 1 : 0 },
+        7 => EqualsPacket = class_for_op { |values| values.inject(&:==) ? 1 : 0 },
+      }
 
       def initialize(version, packets)
         @version = version
@@ -79,7 +60,7 @@ class Day16 < Day
         else
           length_type, length = parse_length(bits)
           sub_packets = parse_sub_packets(bits, length_type, length)
-          OperatorPacket.class_type(type).new(version, sub_packets)
+          OperatorPacket::CLASS_TYPE[type].new(version, sub_packets)
         end
       end
 
