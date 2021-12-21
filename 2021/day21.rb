@@ -52,7 +52,7 @@ class Day21 < Day
 
   def part_1
     player, next_player = 0, 1
-    pos = @pos
+    pos = @pos.dup
     points = [0, 0]
     (1..100).cycle.each_slice(3).lazy.map(&:sum).each_with_index do |move, count|
       pos[player] = ((pos[player] + move) % 10).nonzero? || 10
