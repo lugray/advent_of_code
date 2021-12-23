@@ -2,52 +2,67 @@
 
 require_relative 'day'
 
+class Range
+  def overlap?(other)
+    return false if size.zero? || other.size.zero?
+    include?(other.first) || include?(other.last) || other.include?(first)
+  end
+end
+
 class Day22 < Day
-  def initialize
-    @grid = Array.new(101) { Array.new(101) { Array.new(101) { false } } }
-    input_lines.each do |line|
-      state, rest = line.split(' ')
-      parts = rest.split(',').map { |p| eval(p[2..]) }
-      parts[0].each do |x|
-        parts[1].each do |y|
-          parts[2].each do |z|
-            @grid[x+50][y+50][z+50] = state == 'on'
-          end
-        end
+  class Box
+
+    attr_reader :ranges
+
+    def initialize(ranges)
+      @ranges = ranges
+    end
+
+    def overlap?(other)
+      ranges.zip(other.ranges).all? { |r1, r2| r1.overlap?(r2) }
+    end
+
+    def size
+      ranges.map(&:size).inject(&:*)
+    end
+
+    def -(other)
+      return self unless overlap?(other)
+      new_ranges = ranges.zip(other.ranges).map do |r1, r2|
+        a, b, c, d = [r1.first, r1.last, r2.first, r2.last].sort
+        [(a..b-1), (b..c), (c+1..d)]
+      end
+      [0, 1, 2].repeated_permutation(3).map do |address|
+        Box.new(new_ranges.zip(address).map { |rs, i| rs[i] })
+      end.reject do |box|
+        box.size.zero? || box.overlap?(other) || !box.overlap?(self)
       end
     end
   end
 
+  def initialize
+    @instructions = input_lines.map do |line|
+      state, rest = line.split(' ')
+      ranges = rest.split(',').map { |p| eval(p[2..]) }
+      [state == 'on', Box.new(ranges)]
+    end
+  end
+
+  def count_on(instructions)
+    boxes = []
+    instructions.each do |on, box|
+      boxes = boxes.flat_map { |b| b - box }
+      boxes << box if on
+    end
+    boxes.sum(&:size)
+  end
+
   def part_1
-    @grid.flatten.count(&:itself)
+    count_on(@instructions.select { |_, box| box.ranges.flat_map(&:minmax).map(&:abs).max <= 50 })
   end
 
   def part_2
-  end
-
-  def input
-    <<~I
-      on x=-39..5,y=-35..13,z=-14..36
-      on x=-39..12,y=-43..6,z=-4..42
-      on x=-18..35,y=-24..21,z=-12..34
-      on x=-2..48,y=-14..38,z=-9..44
-      on x=-14..40,y=-37..13,z=-47..4
-      on x=-34..18,y=-5..43,z=-46..5
-      on x=-37..13,y=-37..12,z=-43..6
-      on x=-15..32,y=-4..42,z=-49..3
-      on x=-12..34,y=-7..37,z=-11..35
-      on x=-49..-2,y=-24..21,z=-23..21
-      off x=-41..-30,y=34..43,z=17..29
-      on x=-35..18,y=-19..31,z=-49..-3
-      off x=8..27,y=34..44,z=-42..-23
-      on x=-8..40,y=-19..30,z=-8..37
-      off x=5..21,y=4..18,z=-18..-6
-      on x=-5..47,y=-34..15,z=-10..34
-      off x=36..47,y=16..30,z=-43..-31
-      on x=-26..18,y=-37..9,z=-14..31
-      off x=-48..-31,y=-14..5,z=-46..-29
-      on x=-7..43,y=-47..3,z=-43..2
-    I
+    count_on(@instructions)
   end
 end
 
