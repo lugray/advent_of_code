@@ -17,7 +17,10 @@ class Setup
   end
 
   def headers
-    @headers ||= {'Cookie' => File.read(File.join(dir, 'cookies')).chomp}
+    @headers ||= {
+      'Cookie' => File.read(File.join(dir, 'cookies')).chomp,
+      'User-Agent' => 'https://github.com/lugray/advent_of_code/blob/main/setup.rb by lisa.ugray@gmail.com',
+    }
   end
 
   def http
