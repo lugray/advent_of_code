@@ -10,15 +10,15 @@ class Day01 < Day
   end
 
   def totals
-    @totals ||= @elves.map(&:sum).sort
+    @totals ||= @elves.map(&:sum)
   end
 
   def part_1
-    totals.last
+    totals.max
   end
 
   def part_2
-    totals.last(3).sum
+    totals.max(3).sum
   end
 end
 
