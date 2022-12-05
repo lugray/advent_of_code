@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
 require 'net/http'
+require 'nokogiri'
+require 'fileutils'
 
 class Setup
   attr_reader :dir
@@ -42,20 +44,43 @@ class SetupDay
   def run
     return if Time.new(year, 12, day) > Time.now
     unless File.exist?(input_file)
-      puts "Getting input for day #{day}, in #{year}"
+      print_day
+      puts "  Input"
       resp = http.get("/#{year}/day/#{day}/input", headers)
       File.write(input_file, resp.body)
     end
+    unless File.exist?(example_input_file)
+      FileUtils.touch(example_input_file)
+      print_day
+      puts "  Example Input"
+      resp = http.get("/#{year}/day/#{day}", headers)
+      document = Nokogiri::HTML.parse(resp.body)
+      document.css('pre code').each_with_index do |code, i|
+        File.write(example_input_file(i), code.text)
+      end
+    end
     return if Time.new(year, 12, 30) < Time.now # Don't generate for previous years
     unless File.exist?(day_file)
-      puts "Generating template for day #{day}, in #{year}"
+      print_day
+      puts "  Template"
       File.write(day_file, File.read(template_file).gsub('###', day.to_s.rjust(2, '0')))
       File.chmod(0755, day_file)
     end
   end
 
+  def print_day
+    return if @printed_day
+    puts "Day #{day}, #{year}"
+    @printed_day = true
+  end
+
   def input_file
     File.join(dir, year.to_s, sprintf('day%02d.input', day))
+  end
+
+  def example_input_file(i = 0)
+    suffix = i == 0 ? '' : ".#{i}"
+    File.join(dir, year.to_s, sprintf("day%02d.example#{suffix}", day))
   end
 
   def day_file

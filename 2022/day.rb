@@ -1,6 +1,10 @@
 class Day
   def input
-    File.read("#{self.class.to_s.downcase}.input")
+    if ARGV.include?('--example')
+      File.read("#{self.class.to_s.downcase}.example")
+    else
+      File.read("#{self.class.to_s.downcase}.input")
+    end
   end
 
   def input_lines
