@@ -15,20 +15,24 @@ class Day05 < Day
     end
   end
 
-  def part_1
+  def manipulate_stacks
     stacks = @stacks.map(&:dup)
     @instructions.each do |n, from, to|
-      n.times { stacks[to].push(stacks[from].pop) }
+      yield(stacks, n, from, to)
     end
     stacks.map(&:last).join
   end
 
+  def part_1
+    manipulate_stacks do |stacks, n, from, to|
+      n.times { stacks[to].push(stacks[from].pop) }
+    end
+  end
+
   def part_2
-    stacks = @stacks.map(&:dup)
-    @instructions.each do |n, from, to|
+    manipulate_stacks do |stacks, n, from, to|
       stacks[to].push(*stacks[from].pop(n))
     end
-    stacks.map(&:last).join
   end
 end
 
