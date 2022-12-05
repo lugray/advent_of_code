@@ -2,6 +2,7 @@
 
 require 'net/http'
 require 'nokogiri'
+require 'cli/ui'
 require 'fileutils'
 
 class Setup
@@ -72,6 +73,21 @@ class SetupDay
     return if @printed_day
     puts "Day #{day}, #{year}"
     @printed_day = true
+  end
+
+  def puts(str)
+    @last_start_color ||= 'green'
+    @color = @last_start_color
+    CLI::UI.puts(str.scan(/( +|[^ ]+)/).flatten.map do |word|
+      next word if word =~ /\s/
+      @color = flip_color(@color)
+      "{{#{@color}:#{word}}}"
+    end.join)
+    @last_start_color = flip_color(@last_start_color)
+  end
+
+  def flip_color(color)
+    color == 'green' ? 'red' : 'green'
   end
 
   def input_file

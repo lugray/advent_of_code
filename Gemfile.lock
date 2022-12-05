@@ -3,6 +3,7 @@ GEM
   specs:
     ansi (1.5.0)
     builder (3.2.4)
+    cli-ui (2.1.0)
     minitest (5.14.4)
     minitest-reporters (1.4.3)
       ansi
@@ -22,6 +23,7 @@ PLATFORMS
   x86_64-darwin-20
 
 DEPENDENCIES
+  cli-ui
   minitest-reporters
   nokogiri
 
