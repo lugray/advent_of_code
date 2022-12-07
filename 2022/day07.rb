@@ -33,7 +33,7 @@ class Day07 < Day
         in ['$', 'ls']      ; # Ignore
         in ['$', 'cd', dir] ; current = Directory[current.expand_path(dir)]
         in ['dir', dir]     ; current << Directory[current.expand_path(dir)]
-        in [size, dir]      ; current << FileEntry.new(current.expand_path(dir), size.to_i)
+        in [size, file]     ; current << FileEntry.new(current.expand_path(file), size.to_i)
       end
     end
   end
