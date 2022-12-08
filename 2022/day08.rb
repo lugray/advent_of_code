@@ -2,6 +2,15 @@
 
 require_relative 'day'
 
+module Enumerable
+  def take_until
+    each_with_object([]) do |e, collect|
+      collect << e
+      break collect if yield(e)
+    end
+  end
+end
+
 class Tree
   attr_reader :height, :visible, :scenic
 
@@ -53,14 +62,16 @@ class Day08 < Day
     @forest[i][j]
   end
 
+  def each_tree(i, j, di, dj)
+    return enum_for(:each_tree, i, j, di, dj) unless block_given?
+    while tree = tree_at(i += di, j += dj)
+      yield(tree)
+    end
+  end
+
   def sightline(i, j, di, dj)
     start_height = @forest[i][j].height
-    count = 0
-    while tree = tree_at(i += di, j += dj)
-      count += 1
-      break if tree.height >= start_height
-    end
-    count
+    each_tree(i, j, di, dj).take_until { |t| t.height >= start_height }.size
   end
 
   def part_1
