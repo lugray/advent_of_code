@@ -9,7 +9,7 @@ class Day
 
   def input_lines(&block)
     block ||= method(:to_i_if_i)
-    input.each_line.map(&:chomp).map(&block)
+    input.each_line(chomp: true).map(&block)
   end
 
   def input_grid(sep = ' ', &block)
