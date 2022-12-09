@@ -7,16 +7,18 @@ class Day
     end
   end
 
-  def input_lines
-    input.each_line.map(&:chomp)
+  def input_lines(&block)
+    block ||= method(:to_i_if_i)
+    input.each_line.map(&:chomp).map(&block)
   end
 
-  def input_numbers
-    if input.include?(',')
-      input.split(',').map(&:to_i)
-    else
-      input_lines.map(&:to_i)
-    end
+  def input_grid(sep = ' ', &block)
+    block ||= method(:to_i_if_i)
+    input_lines { |line| line.split(sep).map(&block) }
+  end
+
+  def to_i_if_i(s)
+    s =~ /-?\d+/ ? s.to_i : s
   end
 
   class << self

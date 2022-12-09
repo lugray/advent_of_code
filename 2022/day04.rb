@@ -4,7 +4,7 @@ require_relative 'day'
 
 class Day04 < Day
   def initialize
-    @pairs = input_lines.map do |line|
+    @pairs = input_lines do |line|
       line.split(',').map do |range|
         Range.new(*range.split('-').map(&:to_i))
       end

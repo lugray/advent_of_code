@@ -31,7 +31,7 @@ end
 
 class Day08 < Day
   def initialize
-    @forest = input_lines.map { |l| l.chars.map { |c| Tree.new(c.to_i) } }
+    @forest = input_lines { |l| l.chars.map { |c| Tree.new(c.to_i) } }
   end
 
   def sight_left(forest)
