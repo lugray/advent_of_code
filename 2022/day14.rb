@@ -1,11 +1,8 @@
 #!/usr/bin/env ruby
 
 require_relative 'day'
-require 'matrix'
 
 class Day14 < Day
-  DROPS = [Vector[0, 1], Vector[-1, 1], Vector[1, 1]]
-
   def initialize
     @map = {}
     input.each_line(chomp: true) do |l|
@@ -16,7 +13,7 @@ class Day14 < Day
         y1, y2 = [y1, y2].sort
         (x1..x2).each do |x|
           (y1..y2).each do |y|
-            @map[Vector[x, y]] = :rock
+            @map[[x, y]] = :rock
           end
         end
       end
@@ -24,29 +21,36 @@ class Day14 < Day
     @max_depth = @map.keys.map { |v| v[1] }.max
   end
 
+  def drops(x, y)
+    return enum_for(:drops, x, y) unless block_given?
+    yield [x, y+1]
+    yield [x-1, y+1]
+    yield [x+1, y+1]
+  end
+
   def drop_sand(map = @map.dup)
-    pos = Vector[500, 0]
+    pos = [500, 0]
     while pos[1] <= @max_depth
-      if new_pos = DROPS.map { |d| pos + d }.find { |p| !map[p] }
+      if new_pos = drops(*pos).find { |p| !map[p] }
         pos = new_pos
       else
         map[pos] = :sand
-        pos = Vector[500, 0]
+        pos = [500, 0]
       end
     end
     map
   end
 
   def with_floor(map = @map.dup)
-    (500-@max_depth-2..500+@max_depth+2).each { |x| map[Vector[x, @max_depth+2]] = :rock }
+    (500-@max_depth-2..500+@max_depth+2).each { |x| map[[x, @max_depth+2]] = :rock }
     map
   end
 
-  def sand_fill(map = with_floor, pos = Vector[500, 0])
+  def sand_fill(map = with_floor, pos = [500, 0])
     return map if map[pos]
     map[pos] = :sand
-    DROPS.each do |d|
-      sand_fill(map, pos + d)
+    drops(*pos).each do |p|
+      sand_fill(map, p)
     end
     map
   end
