@@ -1,7 +1,12 @@
 class Day
   def input
     if ARGV.include?('--example')
-      File.read("#{self.class.to_s.downcase}.example")
+      maybe_n = ARGV[ARGV.index('--example') + 1]
+      if maybe_n =~ /\d+/
+        File.read("#{self.class.to_s.downcase}.example.#{maybe_n}")
+      else
+        File.read("#{self.class.to_s.downcase}.example")
+      end
     else
       File.read("#{self.class.to_s.downcase}.input")
     end
@@ -24,8 +29,8 @@ class Day
   class << self
     def run
       day = new
-      puts day.part_1
-      puts day.part_2
+      puts day.part_1 unless ARGV.include?('--part2') && !ARGV.include?('--part1')
+      puts day.part_2 unless ARGV.include?('--part1') && !ARGV.include?('--part2')
     end
 
     def output
