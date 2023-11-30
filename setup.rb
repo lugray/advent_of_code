@@ -12,6 +12,13 @@ class Setup
   end
 
   def run
+    if ARGV.any?
+      unless ARGV.size == 2 && ARGV.first =~ /\d{4}/ && ARGV.last =~ /\d{1,2}/ && ARGV.last.to_i.between?(1, 25)
+        puts "Usage: ruby setup.rb [year day]"
+        exit 1
+      end
+      SetupDay.new(dir, ARGV.first.to_i, ARGV.last.to_i, http, headers, force: true).run
+    end
     dir.each.select {|year| /\d{4}/ =~ year}.map(&:to_i).each do |year|
       (1..25).each do |day|
         SetupDay.new(dir, year, day, http, headers).run
@@ -34,16 +41,17 @@ end
 class SetupDay
   attr_reader :dir, :year, :day, :http, :headers
 
-  def initialize(dir, year, day, http, headers)
+  def initialize(dir, year, day, http, headers, force: false)
     @dir = dir
     @day = day
     @year = year
     @http = http
     @headers = headers
+    @force = force
   end
 
   def run
-    return if Time.new(year, 12, day) > Time.now
+    return if Time.new(year, 12, day) > Time.now && !@force # Don't generate for future days
     unless File.exist?(input_file)
       print_day
       puts "  Input"
@@ -60,7 +68,7 @@ class SetupDay
         File.write(example_input_file(i), code.text)
       end
     end
-    return if Time.new(year, 12, 30) < Time.now # Don't generate for previous years
+    return if Time.new(year, 12, 30) < Time.now && !@force # Don't generate for previous years
     unless File.exist?(day_file)
       print_day
       puts "  Template"

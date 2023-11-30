@@ -27,8 +27,32 @@ class Day22 < Day
     end
   end
 
-  def part_1
-    decks = @decks.map(&:dup)
+  def recursive_combat(decks)
+    seen = Set.new
+    until decks.any?(&:empty?) do
+      if seen.include?(decks)
+        return 0
+      end
+      seen << decks.map(&:dup)
+      cards = decks.map(&:shift)
+      if cards.zip(decks).all? { |card, deck| deck.size >= card }
+        inner_decks = cards.zip(decks).map { |card, deck| deck[0...card] }
+        winner = recursive_combat(inner_decks)
+      else
+        winner = cards.index(cards.max)
+      end
+      cards.reverse! if winner == 1
+      decks[winner].push(cards.first)
+      decks[winner].push(cards.last)
+    end
+    decks.index { |deck| !deck.empty? }
+  end
+  
+  def score(decks)
+    decks.reject(&:empty?).first.reverse.zip(1..).map{ |a, b| a * b }.sum
+  end
+
+  def combat(decks)
     until decks.any?(&:empty?) do
       cards = decks.map(&:shift)
       if cards.first > cards.last
@@ -39,10 +63,18 @@ class Day22 < Day
         decks.last.push(cards.first)
       end
     end
-    decks.reject(&:empty?).first.reverse.zip(1..).map{ |a, b| a * b }.sum
+  end
+
+  def part_1
+    decks = @decks.map(&:dup)
+    combat(decks)
+    score(decks)
   end
 
   def part_2
+    decks = @decks.map(&:dup)
+    recursive_combat(decks)
+    score(decks)
   end
 end
 

@@ -11,7 +11,6 @@ class TestDays < Minitest::Test
     define_method("test_#{basename}") do
       outfile = "#{basename}.output"
       skip "Missing output file #{outfile}" unless File.exist?(outfile)
-      skip "Too slow" if basename =~ /day(12|15|16|19|23)/
       require_relative basename
       assert_equal File.read(outfile), Object.const_get(basename.capitalize).output
     end
