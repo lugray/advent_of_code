@@ -1,3 +1,10 @@
+class String
+  def to_i_if_i
+    i = to_i
+    i.to_s == self ? i : self
+  end
+end
+
 class Day
   def input
     if ARGV.include?('--example')
@@ -13,17 +20,16 @@ class Day
   end
 
   def input_lines(&block)
-    block ||= method(:to_i_if_i)
+    block ||= proc(&:itself)
     input.each_line(chomp: true).map(&block)
   end
 
-  def input_grid(sep = ' ', &block)
-    block ||= method(:to_i_if_i)
-    input_lines { |line| line.split(sep).map(&block) }
-  end
-
-  def to_i_if_i(s)
-    s =~ /-?\d+/ ? s.to_i : s
+  def input_grid(sep: ' ', &block)
+    if block
+      input_lines { |line| line.split(sep).map(&block) }
+    else
+      input_lines { |line| line.split(sep) }
+    end
   end
 
   class << self
