@@ -6,8 +6,7 @@ class Day04 < Day
   def initialize
     @cards = input_lines.each_with_object({}) do |line, cards|
       id, nums = line.split(': ')
-      win, have = nums.split(' | ').map { |set| set.split(' ').map(&:to_i) }
-      cards[id.split(' ').last.to_i] = have.count { |n| win.include?(n) }
+      cards[id.split(' ').last.to_i] = nums.split(' | ').map { |set| set.split(' ').map(&:to_i) }.inject(:&).size
     end
   end
 
