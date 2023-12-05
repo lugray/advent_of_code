@@ -3,6 +3,10 @@ class String
     i = to_i
     i.to_s == self ? i : self
   end
+
+  def ints
+    scan(/-?\d+/).map(&:to_i)
+  end
 end
 
 class Day
@@ -17,6 +21,10 @@ class Day
     else
       File.read("#{self.class.to_s.downcase}.input")
     end
+  end
+
+  def input_paragraphs
+    input.split("\n\n")
   end
 
   def input_lines(&block)
