@@ -10,9 +10,8 @@ class Day06 < Day
   def rekern(ints) = ints.map(&:to_s).join.to_i
 
   def ways_to_win(t, d)
-    min_hold = ((t - Math.sqrt(t**2 - 4 * (d+1))) / 2).ceil
-    max_hold = ((t + Math.sqrt(t**2 - 4 * (d+1))) / 2).floor
-    max_hold - min_hold + 1
+    min_hold, max_hold = quadratic(1, -t, d + 1)
+    max_hold.floor - min_hold.ceil + 1
   end
 
   def part_1
