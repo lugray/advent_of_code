@@ -20,7 +20,7 @@ class Day11 < Day
     @galaxies.combination(2).sum do |(row1, col1), (row2, col2)|
       row1, row2 = [row1, row2].sort
       col1, col2 = [col1, col2].sort
-      (row1...row2).sum { |row| @empty_rows.include?(row) ? expansion_factor : 1 } + (col1...col2).sum { |col| @empty_cols.include?(col) ? expansion_factor : 1 }
+      (@empty_rows.count { (row1...row2).include?(_1) } + @empty_cols.count { (col1...col2).include?(_1) }) * (expansion_factor - 1) + (row2 - row1) + (col2 - col1)
     end
   end
 
