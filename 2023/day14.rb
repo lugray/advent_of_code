@@ -34,7 +34,7 @@ class Day14 < Day
     seen = {}
     i = (1..).find do |i|
       dish = cycle(dish)
-      seen.key?(dish).tap { |s| s || seen[dish] = i }
+      seen.key?(dish).tap { seen[dish] ||= i }
     end
     cycle_length = i - seen[dish]
     remaining = (1_000_000_000 - i) % cycle_length
