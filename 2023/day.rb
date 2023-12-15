@@ -1,3 +1,14 @@
+module Enumerable
+  def cyclic_at(i)
+    seen = {}
+    each_with_index do |e, j|
+      return e if j == i
+      return seen.key(seen[e]+(i-j) % (j-seen[e])) if seen.key?(e)
+      seen[e] = j
+    end
+  end
+end
+
 class String
   def to_i_if_i
     i = to_i

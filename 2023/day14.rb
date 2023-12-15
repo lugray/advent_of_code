@@ -29,17 +29,13 @@ class Day14 < Day
     north_load(north(@dish))
   end
 
-  def part_2
-    dish = @dish
-    seen = {}
-    i = (1..).find do |i|
-      dish = cycle(dish)
-      seen.key?(dish).tap { seen[dish] ||= i }
-    end
-    cycle_length = i - seen[dish]
-    remaining = (1_000_000_000 - i) % cycle_length
+  def each_cycle(dish)
+    return enum_for(:each_cycle, dish) unless block_given?
+    loop { yield dish = cycle(dish) }
+  end
 
-    dish = seen.key(seen[dish]+remaining)
+  def part_2
+    dish = each_cycle(@dish).cyclic_at(1_000_000_000 - 1)
     north_load(dish)
   end
 end
