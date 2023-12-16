@@ -20,6 +20,14 @@ class String
   end
 end
 
+class TrackMax
+  attr_reader :max
+
+  def <<(x)
+    @max = x if @max.nil? || x > @max
+  end
+end
+
 class Day
   def input
     if ARGV.include?('--example')
