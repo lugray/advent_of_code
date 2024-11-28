@@ -2,25 +2,26 @@ GEM
   remote: https://rubygems.org/
   specs:
     ansi (1.5.0)
-    builder (3.2.4)
+    builder (3.3.0)
     cli-ui (2.2.3)
-    minitest (5.20.0)
-    minitest-reporters (1.6.1)
+    minitest (5.25.2)
+    minitest-reporters (1.7.1)
       ansi
       builder
       minitest (>= 5.0)
       ruby-progressbar
-    nokogiri (1.15.5-arm64-darwin)
+    nokogiri (1.16.7-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.15.5-x86_64-darwin)
+    nokogiri (1.16.7-x86_64-darwin)
       racc (~> 1.4)
-    racc (1.7.3)
+    racc (1.8.1)
     ruby-progressbar (1.13.0)
 
 PLATFORMS
   arm64-darwin-21
   arm64-darwin-22
   arm64-darwin-23
+  arm64-darwin-24
   x86_64-darwin-20
 
 DEPENDENCIES
