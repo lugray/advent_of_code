@@ -12,17 +12,26 @@ class Setup
   end
 
   def run
-    if ARGV.any?
+    if ARGV.any? { |arg| arg == "--all" }
+      dir.each.select {|year| /\d{4}/ =~ year}.map(&:to_i).sort.each do |year|
+        setup_year(year)
+      end
+    elsif ARGV.any?
       unless ARGV.size == 2 && ARGV.first =~ /\d{4}/ && ARGV.last =~ /\d{1,2}/ && ARGV.last.to_i.between?(1, 25)
         puts "Usage: ruby setup.rb [year day]"
         exit 1
       end
       SetupDay.new(dir, ARGV.first.to_i, ARGV.last.to_i, http, headers, force: true).run
+    else
+      year = dir.each.select {|year| /\d{4}/ =~ year}.map(&:to_i).sort.last
+      setup_year(year)
     end
-    dir.each.select {|year| /\d{4}/ =~ year}.map(&:to_i).each do |year|
-      (1..25).each do |day|
-        SetupDay.new(dir, year, day, http, headers).run
-      end
+  end
+
+  def setup_year(year)
+    puts "Setting up #{year}:"
+    (1..25).each do |day|
+      SetupDay.new(dir, year, day, http, headers).run
     end
   end
 
