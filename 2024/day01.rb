@@ -4,17 +4,16 @@ require_relative 'day'
 
 class Day01 < Day
   def initialize
-    @lists = input_grid(&:to_i).transpose.each(&:sort!)
+    @lists = input_grid(&:to_i).transpose
   end
 
   def part_1
-    @lists.transpose.sum { |a, b| (a - b).abs }
+    @lists.map(&:sort).transpose.sum { |a, b| (a - b).abs }
   end
 
   def part_2
-    counts = Hash.new(0)
-    @lists.last.each { |n| counts[n] += 1 }
-    @lists.first.sum { |n| n * counts[n] }
+    counts = @lists.last.tally
+    @lists.first.sum { |n| n * counts.fetch(n, 0) }
   end
 end
 
