@@ -8,8 +8,8 @@ class Day02 < Day
   end
 
   def safe?(report)
-    diffs = report.each_cons(2).map { |a, b| b - a }
-    diffs.all? { |diff| diff <= 3 && diff >= 1 } || diffs.all? { |diff| -diff <= 3 && -diff >= 1 }
+    sign = report[0] <=> report[1]
+    report.each_cons(2).all? { |a, b| (1..3).include?((a - b) * sign) }
   end
 
   def part_1
@@ -18,10 +18,7 @@ class Day02 < Day
 
   def part_2
     @reports.count do |report|
-      next true if safe?(report)
-      (0...report.size).any? do |i|
-        safe?(report.dup.tap { |r| r.delete_at(i) })
-      end
+      safe?(report) || report.combination(report.size - 1).any? { |r| safe?(r) }
     end
   end
 end
