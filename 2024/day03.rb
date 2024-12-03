@@ -2,30 +2,24 @@
 
 require_relative 'day'
 
+MUL = /mul\((\d+),(\d+)\)/
+TOGGLE = /(do\(\)|don't\(\))/
+
 class Day03 < Day
   def initialize
     @instructions = input
   end
 
   def part_1
-    @instructions.scan(/mul\((\d+),(\d+)\)/).map { |a, b| a.to_i * b.to_i }.sum
+    @instructions.scan(MUL).sum { |a, b| a.to_i * b.to_i }
   end
 
   def part_2
     enabled = true
-    @instructions.scan(/mul\((\d+),(\d+)\)|(do\(\))|(don't\(\))/).map do |a, b, enable, disable|
-      if enable
-        enabled = true
-        0
-      elsif disable
-        enabled = false
-        0
-      elsif enabled
-        a.to_i * b.to_i
-      else
-        0
-      end
-    end.sum
+    @instructions.scan(/#{MUL}|#{TOGGLE}/).sum do |a, b, toggle|
+      enabled = (toggle == 'do()') and next 0 if toggle
+      enabled ? a.to_i * b.to_i : 0
+    end
   end
 end
 
