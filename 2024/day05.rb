@@ -2,46 +2,36 @@
 
 require_relative 'day'
 
+class Page
+  attr_reader :n
+  @rules = Hash.new(false)
+
+  def self.require_order!(pair) = @rules[pair] = true
+  def self.require_order?(a, b) = @rules[[a,b]]
+  def initialize(n)             = @n = n
+  def <=> (other)               = Page.require_order?(@n, other.n) ? -1 : Page.require_order?(other.n, @n) ? 1 : 0
+end
+
+class PageList
+  def initialize(pages) = @pages = pages
+  def sorted            = @sorted ||= @pages.sort
+  def sorted?           = @pages == sorted
+  def middle_page       = sorted[sorted.size/2].n
+end
+
 class Day05 < Day
   def initialize
-    rules, lists = input.split("\n\n")
-    @rules = rules.each_line(chomp: true).each_with_object({}) do |line, hash|
-      key, value = line.split('|')
-      hash[[key.to_i, value.to_i]] = true
-    end
-    @lists = lists.each_line(chomp: true).map { |line| line.split(',').map(&:to_i) }
-  end
-
-  def ordered_pair?(a, b)
-    !@rules[[b,a]]
-  end
-
-  def ordered_list?(list)
-    list.each_with_index.all? do |a, i|
-      list.drop(i+1).all? { |b| ordered_pair?(a, b) }
-    end
+    rules, lists = input_paragraphs
+    rules.each_line { |line| Page.require_order!(line.split('|').map(&:to_i)) }
+    @lists = lists.grid(sep: ',') { |n| Page.new(n.to_i) }.map { |pages| PageList.new(pages) }
   end
 
   def part_1
-    @lists.select { |list| ordered_list?(list) }.sum do |list|
-      list[list.size/2]
-    end
-  end
-
-  def sort_fn(a, b)
-    if ordered_pair?(a, b)
-      -1
-    elsif ordered_pair?(b, a)
-      1
-    else
-      0
-    end
+    @lists.select(&:sorted?).sum(&:middle_page)
   end
 
   def part_2
-    lists = @lists.reject { |list| ordered_list?(list) }.sum do |list|
-      list.sort { |a, b| sort_fn(a, b) }[list.size/2]
-    end
+    @lists.reject(&:sorted?).sum(&:middle_page)
   end
 end
 

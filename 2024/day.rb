@@ -18,6 +18,19 @@ class String
   def ints
     scan(/-?\d+/).map(&:to_i)
   end
+
+  def lines(&block)
+    block ||= proc(&:itself)
+    each_line(chomp: true).map(&block)
+  end
+
+  def grid(sep: ' ', &block)
+    if block
+      lines { |line| line.split(sep).map(&block) }
+    else
+      lines { |line| line.split(sep) }
+    end
+  end 
 end
 
 class Day
@@ -39,16 +52,11 @@ class Day
   end
 
   def input_lines(&block)
-    block ||= proc(&:itself)
-    input.each_line(chomp: true).map(&block)
+    input.lines(&block)
   end
 
   def input_grid(sep: ' ', &block)
-    if block
-      input_lines { |line| line.split(sep).map(&block) }
-    else
-      input_lines { |line| line.split(sep) }
-    end
+    input.grid(sep: sep, &block)
   end
 
   def quadratic(a, b, c)
