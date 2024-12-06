@@ -44,12 +44,13 @@ class Day06 < Day
 
   def part_1
     tour(@obstacles.dup, visited = @visited.dup, @guard.dup, @facing.dup)
+    @p1_visited = visited
     visited.values.count(&:itself)
   end
 
   def part_2
-    @visited.keys.count do |i, j|
-      next false if @obstacles[[i, j]] || @guard == [i, j]
+    @p1_visited.count do |(i, j), v|
+      next false if !v || @obstacles[[i, j]] || @guard == [i, j]
       obstacles = @obstacles.dup
       obstacles[[i, j]] = true
       tour(obstacles, @visited.dup, @guard.dup, @facing.dup)
