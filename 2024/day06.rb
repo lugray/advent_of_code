@@ -28,33 +28,35 @@ class Day06 < Day
     end
   end
 
-  def tour(obstacles, visited, guard, facing)
+  def tour(obstacles, visited, guard, facing, try_obstacles = false)
+    loop_count = 0
     until visited[guard].nil?
       while !obstacles[[guard[0] + DIRS[facing][0], guard[1] + DIRS[facing][1]]]
+        if try_obstacles
+          new_obstacles = obstacles.dup
+          new_obstacles[[guard[0] + DIRS[facing][0], guard[1] + DIRS[facing][1]]] = true
+          looping, _ = tour(new_obstacles, visited.dup, guard.dup, facing.dup, false)
+          loop_count += 1 if looping
+        end
         guard[0] += DIRS[facing][0]
         guard[1] += DIRS[facing][1]
         break if visited[guard].nil?
-        return true if visited[guard] == facing
+        return [true, loop_count] if visited[guard] == facing
         visited[guard] = facing
       end
       facing = (facing + 1) % 4
     end
-    false
+    return [false, loop_count]
   end
 
   def part_1
     tour(@obstacles.dup, visited = @visited.dup, @guard.dup, @facing.dup)
-    @p1_visited = visited
     visited.values.count(&:itself)
   end
 
   def part_2
-    @p1_visited.count do |(i, j), v|
-      next false if !v || @obstacles[[i, j]] || @guard == [i, j]
-      obstacles = @obstacles.dup
-      obstacles[[i, j]] = true
-      tour(obstacles, @visited.dup, @guard.dup, @facing.dup)
-    end
+    _, loop_count = tour(@obstacles.dup, visited = @visited.dup, @guard.dup, @facing.dup, true)
+    loop_count
   end
 end
 
