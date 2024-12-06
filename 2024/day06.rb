@@ -32,7 +32,7 @@ class Day06 < Day
     loop_count = 0
     until visited[guard].nil?
       while !obstacles[[guard[0] + DIRS[facing][0], guard[1] + DIRS[facing][1]]]
-        if try_obstacles
+        if try_obstacles && !visited.fetch([guard[0] + DIRS[facing][0], guard[1] + DIRS[facing][1]], true) # Only try obstacles if we haven't visited this cell before, and it's on the map
           new_obstacles = obstacles.dup
           new_obstacles[[guard[0] + DIRS[facing][0], guard[1] + DIRS[facing][1]]] = true
           looping, _ = tour(new_obstacles, visited.dup, guard.dup, facing.dup, false)
