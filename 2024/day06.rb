@@ -22,41 +22,45 @@ class Day06 < Day
           @obstacles[[i, j]] = true
         when '^'
           @guard = [i, j]
-          @visited[@guard] = UP
         end
       end
     end
   end
 
-  def tour(obstacles, visited, guard, facing, try_obstacles = false)
-    loop_count = 0
-    until visited[guard].nil?
-      while !obstacles[[guard[0] + DIRS[facing][0], guard[1] + DIRS[facing][1]]]
-        if try_obstacles && !visited.fetch([guard[0] + DIRS[facing][0], guard[1] + DIRS[facing][1]], true) # Only try obstacles if we haven't visited this cell before, and it's on the map
-          new_obstacles = obstacles.dup
-          new_obstacles[[guard[0] + DIRS[facing][0], guard[1] + DIRS[facing][1]]] = true
-          looping, _ = tour(new_obstacles, visited.dup, guard.dup, facing.dup, false)
-          loop_count += 1 if looping
-        end
-        guard[0] += DIRS[facing][0]
-        guard[1] += DIRS[facing][1]
-        break if visited[guard].nil?
-        return [true, loop_count] if visited[guard] == facing
-        visited[guard] = facing
-      end
-      facing = (facing + 1) % 4
+  def next_straight(guard, facing)
+    [guard[0] + DIRS[facing][0], guard[1] + DIRS[facing][1]]
+  end
+
+  def looping?(obstacles, visited, guard, facing)
+    until visited[guard] == facing || visited[guard].nil?
+      visited[guard] = facing
+      facing = (facing + 1) % 4 while obstacles[next_straight(guard, facing)]
+      guard = next_straight(guard, facing)
     end
-    return [false, loop_count]
+    visited[guard] == facing
+  end
+
+  def loop_count(obstacles, visited, guard, facing)
+    loop_count = 0
+    until visited[guard] == facing || visited[guard].nil?
+      facing = (facing + 1) % 4 while obstacles[next_straight(guard, facing)]
+      if visited[next_straight(guard, facing)] == false
+        new_obstacles = obstacles.dup.tap { |h| h[next_straight(guard, facing)] = true }
+        loop_count += 1 if looping?(new_obstacles, visited.dup, guard.dup, facing.dup)
+      end
+      visited[guard] = facing
+      guard = next_straight(guard, facing)
+    end
+    loop_count
   end
 
   def part_1
-    tour(@obstacles.dup, visited = @visited.dup, @guard.dup, @facing.dup)
+    looping?(@obstacles.dup, visited = @visited.dup, @guard.dup, @facing.dup)
     visited.values.count(&:itself)
   end
 
   def part_2
-    _, loop_count = tour(@obstacles.dup, visited = @visited.dup, @guard.dup, @facing.dup, true)
-    loop_count
+    loop_count(@obstacles.dup, visited = @visited.dup, @guard.dup, @facing.dup)
   end
 end
 
