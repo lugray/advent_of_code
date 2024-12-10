@@ -5,14 +5,12 @@ require_relative 'day'
 class Day10 < Day
   def initialize
     @map = {}
+    @reaches = {}
     input_lines.each_with_index do |line, row|
       line.each_char.each_with_index do |char, col|
         @map[[row, col]] = char.to_i
       end
     end
-    @reaches = Hash.new { |h, k| h[k] = [] }
-    @rating = Hash.new { |h, k| h[k] = [] }
-    count!
   end
 
   def neighbors(pos)
@@ -20,40 +18,20 @@ class Day10 < Day
     [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]]
   end
 
-  def count!
-    @map.each do |pos, value|
-      next unless value == 9
-      neighbors(pos).each do |neighbor|
-        next unless @map[neighbor] == 8
-        @reaches[neighbor] << pos unless @reaches[neighbor].include?(pos)
-        @rating[neighbor] << pos
-      end
-    end
-    (8.downto(1)).each do |value|
-      @map.each do |pos, v|
-        next unless v == value
-        neighbors(pos).each do |neighbor|
-          next unless @map[neighbor] == value - 1
-          @reaches[neighbor] += @reaches[pos]
-          @reaches[neighbor].uniq!
-          @rating[neighbor] += @rating[pos]
-        end
-      end
+  def reaches(pos)
+    @reaches[pos] ||= if @map[pos] == 9
+      [pos]
+    else
+      neighbors(pos).flat_map { |n| @map[n] == @map[pos] + 1 ? reaches(n) : [] }
     end
   end
 
   def part_1
-    @reaches.sum do |pos, reach|
-      next 0 unless @map[pos] == 0
-      reach.size
-    end
+    @map.sum { |pos, value| value == 0 ? reaches(pos).uniq.size : 0 }
   end
 
   def part_2
-    @rating.sum do |pos, rating|
-      next 0 unless @map[pos] == 0
-      rating.size
-    end
+    @map.sum { |pos, value| value == 0 ? reaches(pos).size : 0 }
   end
 end
 
