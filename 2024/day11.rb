@@ -11,13 +11,10 @@ class Day11 < Day
   def size_after(val, blinks)
     @size_after[[val, blinks]] ||= begin
       return 1 if blinks == 0
-      case val
-      when 0
-        size_after(1, blinks-1)
-      when ->(v) { v.to_s.size.even? }
-        str = val.to_s
-        l = str.size / 2
-        size_after(str[0...l].to_i, blinks-1) + size_after(str[l..].to_i, blinks-1)
+      return size_after(1, blinks-1) if val == 0
+      if (s = Math.log(val, 10).floor + 1).even?
+        a, b = val.divmod(10**(s / 2))
+        size_after(a, blinks-1) + size_after(b, blinks-1)
       else
         size_after(val * 2024, blinks-1)
       end
