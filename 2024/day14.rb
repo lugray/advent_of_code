@@ -15,6 +15,11 @@ class Day14 < Day
     robots = robots_after(100).map { |x, y| [x <=> (@mx / 2), y <=> (@my / 2)] }.reject { |a, b| a.zero? || b.zero? }.tally.values.inject(:*)
   end
 
+  def variance(list)
+    mean = list.sum.to_f / list.size
+    list.sum { |x| (x - mean) ** 2 } / list.size
+  end
+
   def show(t)
     robots = robots_after(t)
     puts ((0..@my).map do |y|
@@ -25,10 +30,16 @@ class Day14 < Day
   end
 
   def part_2
-    n = 7
+    xmod = (0..@mx).min_by do |t|
+      variance(robots_after(t).map(&:first))
+    end
+    ymod = (0..@my).min_by do |t|
+      variance(robots_after(t).map(&:last))
+    end
+    n = xmod
     loop do
-      break if n % 103 == 53
-      n += 101
+      break if n % @my == ymod
+      n += @mx
     end
     show(n)
     puts n
