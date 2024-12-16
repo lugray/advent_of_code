@@ -41,8 +41,7 @@ class Day14 < Day
       break if n % @my == ymod
       n += @mx
     end
-    show(n)
-    puts n
+    n
   end
 end
 
