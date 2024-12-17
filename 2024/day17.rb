@@ -5,8 +5,8 @@ require_relative 'day'
 class Opcode
   OPCODES = [:adv, :bxl, :bst, :jnz, :bxc, :out, :bdv, :cdv]
 
-  def initialize(reg, prog)
-    @reg = reg
+  def initialize(prog, a: 0, b: 0, c: 0)
+    @reg = { a:, b:, c: }
     @prog = prog
     @pc = 0
     @out = []
@@ -14,51 +14,21 @@ class Opcode
 
   def combo(n)
     case n
-    when 0, 1, 2, 3
-      n
-    when 4
-      @reg[:A]
-    when 5
-      @reg[:B]
-    when 6
-      @reg[:C]
-    when 7
-      raise 'Invalid combo operand'
+    when 0, 1, 2, 3 then n
+    when 4 then @reg[:a]
+    when 5 then @reg[:b]
+    when 6 then @reg[:c]
     end
   end
 
-  def adv(n)
-    @reg[:A] = @reg[:A] >> combo(n)
-  end
-
-  def bxl(n)
-    @reg[:B] = @reg[:B] ^ n
-  end
-
-  def bst(n)
-    @reg[:B] = combo(n) % 8
-  end
-
-  def jnz(n)
-    return if @reg[:A] == 0
-    @pc = n - 2
-  end
-
-  def bxc(_n)
-    @reg[:B] = @reg[:B] ^ @reg[:C]
-  end
-
-  def out(n)
-    @out << combo(n) % 8
-  end
-
-  def bdv(n)
-    @reg[:B] = @reg[:A] >> combo(n)
-  end
-
-  def cdv(n)
-    @reg[:C] = @reg[:A] >> combo(n)
-  end
+  def adv(n) = @reg[:a] = @reg[:a] >> combo(n)
+  def bxl(n) = @reg[:b] = @reg[:b] ^ n
+  def bst(n) = @reg[:b] = combo(n) % 8
+  def jnz(n) = (@pc = n - 2 unless @reg[:a] == 0)
+  def bxc(n) = @reg[:b] = @reg[:b] ^ @reg[:c]
+  def out(n) = @out << combo(n) % 8
+  def bdv(n) = @reg[:b] = @reg[:a] >> combo(n)
+  def cdv(n) = @reg[:c] = @reg[:a] >> combo(n)
 
   def run
     while @pc < @prog.size
@@ -68,18 +38,6 @@ class Opcode
     end
     @out
   end
-
-  def quine?
-    while @pc < @prog.size
-      op, n = @prog[@pc], @prog[@pc + 1]
-      public_send(OPCODES[op], n)
-      if op ==5
-        break unless @out.zip(@prog).all? { |a, b| a == b }
-      end
-      @pc += 2
-    end
-    @out == @prog
-  end
 end
 
 class Day17 < Day
@@ -87,13 +45,13 @@ class Day17 < Day
     reg, prog = input_paragraphs
     @reg = reg.each_line(chomp: true).each_with_object({}) do |line, h|
       a, b = line.split(': ')
-      h[a[-1].to_sym] = b.to_i
+      h[a[-1].downcase.to_sym] = b.to_i
     end
     @prog = prog.split(' ').last.split(',').map(&:to_i)
   end
 
   def part_1
-    Opcode.new(@reg.dup, @prog.dup).run.join(',')
+    Opcode.new(@prog, **@reg).run.join(',')
   end
 
   def part_2
@@ -101,7 +59,7 @@ class Day17 < Day
     @prog.reverse.each do |n|
       a = a << 3
       loop do
-        out = Opcode.new({A: a, B: 0, C: 0}, @prog.dup).run
+        out = Opcode.new(@prog, a: a).run
         break if out == @prog[-out.size..-1]
         a += 1
       end
