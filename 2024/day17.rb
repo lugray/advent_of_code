@@ -101,16 +101,11 @@ class Day17 < Day
     @prog.reverse.each do |n|
       a = a << 3
       loop do
-        b = a % 8
-        b = b ^ 5
-        c = a >> b
-        b = b ^ 6
-        b = b ^ c
-        break if b % 8 == n
+        out = Opcode.new({A: a, B: 0, C: 0}, @prog.dup).run
+        break if out == @prog[-out.size..-1]
         a += 1
       end
     end
-    raise unless Opcode.new({A: a, B: 0, C: 0}, @prog.dup).quine?
     a
   end
 end
