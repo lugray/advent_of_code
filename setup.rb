@@ -11,13 +11,24 @@ class Setup
     @dir = Dir.new(dir)
   end
 
+  def days_in_year(year)
+    case year
+    when 2015..2024
+      25
+    when (2025..)
+      12
+    else
+      0
+    end
+  end
+
   def run
     if ARGV.any? { |arg| arg == "--all" }
       dir.each.select {|year| /\d{4}/ =~ year}.map(&:to_i).sort.each do |year|
         setup_year(year)
       end
     elsif ARGV.any?
-      unless ARGV.size == 2 && ARGV.first =~ /\d{4}/ && ARGV.last =~ /\d{1,2}/ && ARGV.last.to_i.between?(1, 25)
+      unless ARGV.size == 2 && ARGV.first =~ /\d{4}/ && ARGV.last =~ /\d{1,2}/ && ARGV.last.to_i.between?(1, days_in_year(ARGV.first.to_i))
         puts "Usage: ruby setup.rb [year day]"
         exit 1
       end
@@ -30,7 +41,7 @@ class Setup
 
   def setup_year(year)
     puts "Setting up #{year}:"
-    (1..25).each do |day|
+    (1..days_in_year(year)).each do |day|
       SetupDay.new(dir, year, day, http, headers).run
     end
   end
