@@ -8,9 +8,9 @@ class Day03 < Day
   end
 
   def bank_max(bank, batteries)
-    return "" if batteries == 0
+    return 0 if batteries == 0
     max, i = bank[..-batteries].each_with_index.max_by(&:first)
-    (max.to_s + bank_max(bank[i+1..], batteries - 1).to_s).to_i
+    max * 10**(batteries-1) + bank_max(bank[i+1..], batteries - 1)
   end
 
   def part_1
