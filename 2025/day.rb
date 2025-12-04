@@ -48,6 +48,15 @@ class Day
     input.grid(sep: sep, &block)
   end
 
+  def each_input_grid_pos
+    return enum_for(:each_input_grid_pos) unless block_given?
+    input_lines.each_with_index do |line, row|
+      line.each_char.each_with_index do |char, col|
+        yield row, col, char
+      end
+    end
+  end
+
   class << self
     def run
       day = new
