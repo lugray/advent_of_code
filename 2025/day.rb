@@ -23,8 +23,11 @@ class String
 end
 
 class Day
+  def is_example?
+    ARGV.include?('--example')
+  end
   def input
-    if ARGV.include?('--example')
+    if is_example?
       maybe_n = ARGV[ARGV.index('--example') + 1]
       if maybe_n =~ /\d+/
         File.read("#{self.class.to_s.downcase}.example.#{maybe_n}")
