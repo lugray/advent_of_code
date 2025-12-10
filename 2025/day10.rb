@@ -14,22 +14,16 @@ class Day10 < Day
       @buttons = @raw_buttons.map { |b| b.sum { |i| 1 << i } }
     end
 
-    def shortest_button_pattern_length
-      button_patterns.map { |p| p.to_s(2).each_char.count('1') }.min
-    end
-
-    def button_patterns
+    def min_presses_for_lights
       (0...(2**@buttons.size)).select do |mask|
         @buttons.each_with_index.select { |b, i| (mask & (1 << i)) != 0 }.map(&:first).inject(0, :^) == @lights
-      end
+      end.map { |p| p.to_s(2).each_char.count('1') }.min
     end
 
-    def min_presses
+    def min_presses_for_joltage
       solver = Z3::Optimize.new
       counts = @raw_buttons.each_with_index.map do |b, bi|
-        c = Z3::Int(bi.to_s)
-        solver.assert(c >= 0)
-        c
+        Z3::Int(bi.to_s).tap { |c| solver.assert(c >= 0) }
       end
       @joltage.each_with_index do |j, ji|
         solver.assert(@raw_buttons.each_with_index.filter_map { |b, bi| counts[bi] if b.include?(ji) }.inject(&:+) == j)
@@ -47,11 +41,11 @@ class Day10 < Day
   end
 
   def part_1
-    @machines.map(&:shortest_button_pattern_length).sum
+    @machines.map(&:min_presses_for_lights).sum
   end
 
   def part_2
-    @machines.map(&:min_presses).sum
+    @machines.map(&:min_presses_for_joltage).sum
   end
 end
 
