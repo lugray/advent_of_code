@@ -4,6 +4,8 @@ GEM
     ansi (1.5.0)
     builder (3.3.0)
     cli-ui (2.2.3)
+    ffi (1.17.2-arm64-darwin)
+    ffi (1.17.2-x86_64-darwin)
     mini_portile2 (2.8.9)
     minitest (5.25.2)
     minitest-reporters (1.7.1)
@@ -17,6 +19,8 @@ GEM
     openssl (3.3.2)
     racc (1.8.1)
     ruby-progressbar (1.13.0)
+    z3 (0.0.20251017)
+      ffi (~> 1.17)
 
 PLATFORMS
   arm64-darwin-21
@@ -31,6 +35,7 @@ DEPENDENCIES
   minitest-reporters
   nokogiri
   openssl (~> 3.3.1)
+  z3
 
 BUNDLED WITH
    2.3.26
